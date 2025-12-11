@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, Pressable } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '../theme';
 import { validateEmail, validatePassword } from '../utils/validators';
 
-export const LoginScreen = () => {
+// Pantalla de login, ruta: /login
+export default function LoginScreen() {
   const theme = useAppTheme();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -54,11 +56,11 @@ export const LoginScreen = () => {
     }
 
     console.log('Login con:', email.trim(), password);
-    // TODO: Lógica de autenticación
+    // TODO: Implementar autenticación con apiService
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.content}>
         {/* Logo y título */}
         <View style={styles.logoContainer}>
@@ -87,7 +89,7 @@ export const LoginScreen = () => {
                 autoComplete="email"
                 textContentType="emailAddress" // Autocompletar email en iOS
                 autoCorrect={false}
-                keyboardType="email-address" // Tipo de teclado para email en moviles
+                keyboardType="email-address" // Teclado optimizado para email en móviles
                 error={touched.email && !!emailError}
                 left={<TextInput.Icon icon="at" color={theme.colors.onBackground} />}
                 style={[styles.inputStyle, { backgroundColor: theme.colors.quaternary }]}
@@ -98,7 +100,7 @@ export const LoginScreen = () => {
                 } }}
               />
             </View>
-            {/* Mensaje de error de validación */}
+            {/* Mensaje de error para email */}
             {touched.email && emailError ? (
               <HelperText type="error" visible={true} style={styles.helperText}>
                 {emailError}
@@ -123,10 +125,10 @@ export const LoginScreen = () => {
                 returnKeyType="done" // Tecla "Done" en el teclado en móviles
                 onSubmitEditing={handleLogin} // Maneja el login al presionar "Enter" en web o "Done" en móviles
                 error={touched.password && !!passwordError}
-                left={<TextInput.Icon icon="lock" color={theme.colors.onBackground} />}
+                left={<TextInput.Icon icon="lock-outline" color={theme.colors.onBackground} />}
                 right={
                   <TextInput.Icon
-                    icon={showPassword ? 'eye-off' : 'eye'}
+                    icon={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     color={theme.colors.onBackground}
                     onPress={() => setShowPassword(!showPassword)}
                   />
@@ -139,7 +141,7 @@ export const LoginScreen = () => {
                 } }}
               />
             </View>
-            {/* Mensaje de error de validación */}
+            {/* Mensaje de error para contraseña */}
             {touched.password && passwordError ? (
               <HelperText type="error" visible={true} style={styles.helperText}>
                 {passwordError}
@@ -169,13 +171,13 @@ export const LoginScreen = () => {
             contentStyle={styles.buttonContent}
             labelStyle={theme.fonts.titleMedium}
           >
-            Inicia sesión
+            Iniciar Sesión
           </Button>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

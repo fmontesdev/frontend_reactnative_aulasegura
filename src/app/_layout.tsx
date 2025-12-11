@@ -1,13 +1,12 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
-import { LoginScreen } from './src/app/LoginScreen';
 import { useFonts, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
-import { lightTheme } from './src/theme';
+import { lightTheme } from '../theme';
 
-export default function App() {
+// Layout raíz, configura los providers globales y la navegación
+export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_500Medium,
@@ -22,16 +21,8 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="auto" />
       <PaperProvider theme={lightTheme}>
-        <SafeAreaView style={styles.container}>
-          <LoginScreen />
-        </SafeAreaView>
+        <Stack screenOptions={{headerShown: false}}/>
       </PaperProvider>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
