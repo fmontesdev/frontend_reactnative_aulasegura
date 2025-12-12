@@ -4,8 +4,12 @@ import { PaperProvider } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Roboto_400Regular, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { lightTheme } from '../theme';
+import { AuthProvider } from '../contexts/AuthContext';
 
-// Layout raíz, configura los providers globales y la navegación
+/**
+* Layout raíz
+* Configura los providers globales y la navegación
+*/
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
@@ -21,7 +25,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <StatusBar style="auto" />
       <PaperProvider theme={lightTheme}>
-        <Stack screenOptions={{headerShown: false}}/>
+        <AuthProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </AuthProvider>
       </PaperProvider>
     </SafeAreaProvider>
   );

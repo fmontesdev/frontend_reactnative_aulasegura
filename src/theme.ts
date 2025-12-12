@@ -156,8 +156,8 @@ const customLightTheme = {
     onErrorContainer: 'rgb(233, 104, 104)',   // #E96868 (onLightRed)
     
     // Background y Surface
-    background: 'rgb(24, 45, 115)',           // #182D73 (primary como background)
-    onBackground: 'rgb(255, 255, 255)',       // #FFFFFF
+    background: 'rgb(243, 247, 251)',         // #F3F7FB
+    onBackground: 'rgb(0, 0, 0)',             // #000000
     surface: 'rgb(255, 255, 255)',            // #FFFFFF
     onSurface: 'rgb(0, 0, 0)',                // #000000
     surfaceVariant: 'rgb(171, 199, 245)',     // #ABC7F5 (quaternary)
