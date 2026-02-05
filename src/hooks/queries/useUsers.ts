@@ -102,3 +102,30 @@ export function useDeleteUser() {
     },
   });
 }
+
+// Hook para subir avatar de un usuario
+// Actualiza automáticamente el caché de usuarios tras subir el avatar
+export function useUploadAvatar() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, file }: { userId: string; file: File }) =>
+      userService.uploadAvatar(userId, file),
+    onSuccess: (updatedUser) => {
+      // Actualiza el usuario en el caché de la lista
+      queryClient.setQueryData<User[]>(userKeys.lists(), (oldUsers) => {
+        if (!oldUsers) return oldUsers;
+        return oldUsers.map((user) =>
+          user.userId === updatedUser.userId ? updatedUser : user
+        );
+      });
+
+      // Actualiza el usuario en el caché de detalle
+      queryClient.setQueryData(userKeys.detail(updatedUser.userId), updatedUser);
+
+      // Invalida queries relacionadas para forzar refetch si es necesario
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(updatedUser.userId) });
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    },
+  });
+}
