@@ -30,6 +30,7 @@ export interface CreateUserData {
   password: string;
   roles: RoleName[];
   avatar: string;
+  validTo?: string | null;
   departmentId?: number;
 }
 
