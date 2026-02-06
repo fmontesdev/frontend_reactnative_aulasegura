@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Text, Avatar, ActivityIndicator, IconButton, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../../theme';
+import { useFilters } from '../../../contexts/FilterContext';
 import { useUsers, useDeleteUser } from '../../../hooks/queries/useUsers';
 import { API_CONFIG } from '../../../constants';
 import { StyledChip } from '../../../components/StyledChip';
@@ -17,13 +18,23 @@ import { styles } from './users.styles';
 export default function UsersScreen() {
   const theme = useAppTheme();
   const router = useRouter();
+  const { filters } = useFilters();
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentLimit, setCurrentLimit] = useState(10);
 
+  // Resetear a página 1 cuando cambien los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
   // Hook de TanStack Query para obtener todos los usuarios
-  const { data: usersResponse, isLoading, error, isFetching, refetch } = useUsers({page: currentPage, limit: currentLimit});
+  const { data: usersResponse, isLoading, error, isFetching, refetch } = useUsers({
+    page: currentPage, 
+    limit: currentLimit,
+    filters: filters.length > 0 ? filters : undefined,
+  });
   const deleteUser = useDeleteUser();
 
   // Extraer datos y metadata de la respuesta paginada

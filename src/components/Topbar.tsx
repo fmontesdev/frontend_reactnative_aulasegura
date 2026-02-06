@@ -19,7 +19,6 @@ export default function Topbar({ sidebarCollapsed }: TopbarProps) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const { width } = useWindowDimensions();
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState('2025-2026');
 
   // Breakpoints para responsive
@@ -29,11 +28,6 @@ export default function Topbar({ sidebarCollapsed }: TopbarProps) {
   const handleLogout = async () => {
     await signOut();
     router.replace('/login');
-  };
-
-  const handleSearch = () => {
-    // TODO: Implementar búsqueda global
-    console.log('Buscar:', searchQuery);
   };
 
   const handleYearSelect = (year: string) => {
@@ -54,22 +48,10 @@ export default function Topbar({ sidebarCollapsed }: TopbarProps) {
       ]}
     >
       {/* Búsqueda: visible solo en pantallas grandes */}
-      {isLargeScreen && (
-        <GlobalSearch
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onSubmit={handleSearch}
-        />
-      )}
+      {isLargeScreen && <GlobalSearch />}
 
       {/* Menú de búsqueda para pantallas pequeñas */}
-      {!isLargeScreen && (
-        <SearchMenu
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onSubmit={handleSearch}
-        />
-      )}
+      {!isLargeScreen && <SearchMenu />}
 
       <View style={styles.rightSection}>
         {/* Selector de año: ocultar en pantallas muy pequeñas */}
