@@ -9,7 +9,8 @@ import { API_CONFIG } from '../../../constants';
 import { StyledChip } from '../../../components/StyledChip';
 import { DataTable } from '../../../components/DataTable';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
-import { User, RoleName } from '../../../types/User';
+import { TooltipWrapper } from '../../../components/TooltipWrapper';
+import { User } from '../../../types/User';
 import { getRoleLabel, getRoleColor } from '../../../utils/roleUtils';
 import { getUsersColumns } from './columns.config.users';
 import { styles } from './users.styles';
@@ -169,15 +170,9 @@ export default function UsersScreen() {
 
             {/* Columna de departamento */}
             <View style={styles.cellDepartment}>
-              {user.roles.includes(RoleName.TEACHER) && user.department ? (
-                <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                  {user.department.name}
-                </Text>
-              ) : (
-                <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
-                  &nbsp;
-                </Text>
-              )}
+              <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
+                {user.department?.name ?? '-'}
+              </Text>
             </View>
 
             {/* Columna de estado */}
@@ -191,26 +186,30 @@ export default function UsersScreen() {
 
             {/* Columna de acciones */}
             <View style={styles.cellActions}>
-              <IconButton
-                icon="pencil"
-                size={20}
-                iconColor={theme.colors.secondary}
-                onPress={() => handleEdit(user)}
-                style={{
-                  marginVertical: -1,
-                  marginLeft: -10,
-                }}
-              />
-              <IconButton
-                icon="delete"
-                size={20}
-                iconColor={theme.colors.error}
-                onPress={() => handleDeleteClick(user)}
-                style={{
-                  marginVertical: -1,
-                  marginLeft: -2,
-                }}
-              />
+              <TooltipWrapper title="Editar">
+                <IconButton
+                  icon="pencil"
+                  size={20}
+                  iconColor={theme.colors.secondary}
+                  onPress={() => handleEdit(user)}
+                  style={{
+                    marginVertical: -1,
+                    marginLeft: -10,
+                  }}
+                />
+              </TooltipWrapper>
+              <TooltipWrapper title="Eliminar">
+                <IconButton
+                  icon="delete"
+                  size={20}
+                  iconColor={theme.colors.error}
+                  onPress={() => handleDeleteClick(user)}
+                  style={{
+                    marginVertical: -1,
+                    marginLeft: -2,
+                  }}
+                />
+              </TooltipWrapper>
             </View>
           </>
         )}

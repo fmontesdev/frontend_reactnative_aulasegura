@@ -7,7 +7,8 @@ export const styles = StyleSheet.create({
   formGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    columnGap: 20,
+    rowGap: 12,
     marginBottom: 12,
   },
   formGridItem: {

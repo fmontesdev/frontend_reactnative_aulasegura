@@ -13,7 +13,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   isLoading?: boolean;
-  variant?: 'danger' | 'warning' | 'info';
+  variant?: 'danger' | 'warning' | 'info' | 'success';
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -50,6 +50,12 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           title: theme.colors.tertiary,
           confirmButton: theme.colors.tertiary,
           confirmText: theme.colors.onTertiary,
+        };
+      case 'success':
+        return {
+          title: theme.colors.success,
+          confirmButton: theme.colors.success,
+          confirmText: theme.colors.onSuccess,
         };
       default:
         return {

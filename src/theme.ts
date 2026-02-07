@@ -261,6 +261,8 @@ export const appLightTheme = {
     // Colores personalizados adicionales
     quaternary: 'rgb(171, 199, 245)',      // #ABC7F5
     onQuaternary: 'rgb(0, 0, 0)',          // #000000
+    quinary: 'rgb(215, 230, 247)',         // #ABC7F5
+    onQuinary: 'rgb(0, 0, 0)',             // #000000
     success: 'rgb(46, 184, 114)',          // #2EB872
     onSuccess: 'rgb(255, 255, 255)',       // #FFFFFF
     warning: 'rgb(245, 158, 11)',          // #F59E0B
@@ -281,6 +283,8 @@ export const appDarkTheme = {
     // Colores personalizados adicionales
     quaternary: 'rgb(171, 199, 245)',      // #ABC7F5
     onQuaternary: 'rgb(0, 0, 0)',          // #000000
+    quinary: 'rgb(215, 230, 247)',         // #ABC7F5
+    onQuinary: 'rgb(0, 0, 0)',             // #000000
     success: 'rgb(46, 184, 114)',          // #2EB872
     onSuccess: 'rgb(11, 11, 11)',          // #0B0B0B
     warning: 'rgb(245, 158, 11)',          // #F59E0B
