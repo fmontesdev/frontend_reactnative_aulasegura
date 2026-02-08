@@ -1,94 +1,73 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { Appbar, ActivityIndicator, Text, IconButton } from 'react-native-paper';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Text, IconButton } from 'react-native-paper';
 import { useAppTheme } from '../../../theme';
 import { UserForm } from '../../../components/UserForm';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
 import { useUser, useUpdateUser } from '../../../hooks/queries/useUsers';
 import { UserEditFormData } from '../../../schemas/user.schema';
 
+// Pantalla para editar un usuario existente
 export default function EditUserScreen() {
   const theme = useAppTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: user, isLoading, isError } = useUser(id);
-  const updateUser = useUpdateUser();
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
+  
+  // Obtener datos del usuario
+  const { data: user, isLoading, error } = useUser(id);
+  const updateUser = useUpdateUser();
 
   const handleSubmit = async (data: UserEditFormData) => {
     if (!id) return;
 
     try {
       await updateUser.mutateAsync({ userId: id, data });
-      router.back();
+      setSnackbarMessage('Usuario actualizado exitosamente');
+      setSnackbarType('success');
+      setSnackbarVisible(true);
+      // Navegar de vuelta después de un breve delay para mostrar el snackbar
+      setTimeout(() => router.back(), 1500);
     } catch (error: any) {
-      console.error('Error updating user:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Error al actualizar el usuario';
-      setSnackbarMessage(errorMessage);
+      setSnackbarMessage(
+        error instanceof Error ? error.message : 'Error al actualizar el usuario'
+      );
+      setSnackbarType('error');
       setSnackbarVisible(true);
     }
   };
 
   if (isLoading) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            header: () => (
-              <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
-                <Appbar.BackAction onPress={() => router.back()} />
-                <Appbar.Content title="Editar Usuario" />
-              </Appbar.Header>
-            ),
-          }}
-        />
-        <View style={[styles.container, styles.centered]}>
-          <ActivityIndicator size="large" />
-        </View>
-      </>
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text variant="bodyLarge" style={{ marginTop: 16, color: theme.colors.secondary }}>
+          Cargando usuario...
+        </Text>
+      </View>
     );
   }
 
-  if (isError || !user) {
+  if (error || !user) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            header: () => (
-              <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
-                <Appbar.BackAction onPress={() => router.back()} />
-                <Appbar.Content title="Editar Usuario" />
-              </Appbar.Header>
-            ),
-          }}
-        />
-        <View style={[styles.container, styles.centered]}>
-          <Text>Error al cargar el usuario</Text>
-        </View>
-      </>
+      <View style={[styles.container, styles.centered]}>
+        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
+          Error al cargar el usuario
+        </Text>
+        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
+          {error instanceof Error ? error.message : 'El usuario no existe'}
+        </Text>
+      </View>
     );
   }
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          header: () => (
-            <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
-              <Appbar.BackAction onPress={() => router.back()} />
-              <Appbar.Content title="Editar Usuario" />
-            </Appbar.Header>
-          ),
-        }}
-      />
       <View style={styles.container}>
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
+          <View style={styles.titleWrapper}>
             <IconButton
               icon="arrow-left"
               size={22}
@@ -99,6 +78,9 @@ export default function EditUserScreen() {
               Editar Usuario
             </Text>
           </View>
+        <Text variant="bodyMedium" style={[ styles.description,{ color: theme.colors.grey }]}>
+          Modifica los datos del usuario{' '}
+        </Text>
         </View>
 
         <UserForm
@@ -117,9 +99,9 @@ export default function EditUserScreen() {
             label: 'Cerrar',
             onPress: () => setSnackbarVisible(false),
           }}
+          duration={1500}
         />
       </View>
-    </>
   );
 }
 
@@ -132,16 +114,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: -4,
-    marginLeft: -6,
-    paddingBottom: 8,
+    marginTop: -6,
+    paddingBottom: 18,
   },
-  headerLeft: {
+  titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+    marginLeft: -6,
+    marginBottom: -2,
+  },
+  description: {
+    paddingLeft: 8,
   },
 });

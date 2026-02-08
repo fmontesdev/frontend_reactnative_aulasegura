@@ -1,7 +1,3 @@
-/**
- * Pantalla para crear un nuevo curso
- */
-
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
@@ -12,6 +8,7 @@ import { CourseForm } from '../../../../components/CourseForm';
 import { CourseFormData } from '../../../../schemas/course.schema';
 import { StyledSnackbar } from '../../../../components/StyledSnackbar';
 
+// Pantalla para crear un nuevo curso
 export default function CreateCourseScreen() {
   const theme = useAppTheme();
   const router = useRouter();
@@ -26,9 +23,12 @@ export default function CreateCourseScreen() {
       setSnackbarMessage('Curso creado exitosamente');
       setSnackbarType('success');
       setSnackbarVisible(true);
+      // Navegar de vuelta después de un breve delay para mostrar el snackbar
       setTimeout(() => router.back(), 1500);
     } catch (error: any) {
-      setSnackbarMessage(error.message || 'Error al crear el curso');
+      setSnackbarMessage(
+        error instanceof Error ? error.message : 'Error al crear el curso'
+      );
       setSnackbarType('error');
       setSnackbarVisible(true);
     }
@@ -37,7 +37,7 @@ export default function CreateCourseScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
+        <View style={styles.titleWrapper}>
           <IconButton
             icon="arrow-left"
             size={22}
@@ -48,6 +48,9 @@ export default function CreateCourseScreen() {
             Nuevo Curso
           </Text>
         </View>
+        <Text variant="bodyMedium" style={[ styles.description,{ color: theme.colors.grey }]}>
+          Completa los datos para crear un nuevo curso
+        </Text>
       </View>
 
       <CourseForm
@@ -65,6 +68,7 @@ export default function CreateCourseScreen() {
           label: 'Cerrar',
           onPress: () => setSnackbarVisible(false),
         }}
+        duration={1500}
       />
     </View>
   );
@@ -75,16 +79,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginLeft: -6,
     paddingTop: 18,
-    paddingBottom: 8,
+    paddingBottom: 18,
   },
-  headerLeft: {
+  titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
+    marginLeft: -6,
+    marginBottom: -2,
+  },
+  description: {
+    paddingLeft: 8,
   },
 });
