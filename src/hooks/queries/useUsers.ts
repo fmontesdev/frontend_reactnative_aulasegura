@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../../services/userService';
 import { UpdateUserData, CreateUserData, UsersFilters } from '../../types/User';
+import { departmentKeys } from './useDepartments';
 
 // Keys para el caché de React Query
 export const userKeys = {
@@ -44,6 +45,9 @@ export function useCreateUser() {
     onSuccess: () => {
       // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+
+      // Invalida también departamentos por si el nuevo usuario tiene departamento
+      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
     },
   });
 }
@@ -62,6 +66,9 @@ export function useUpdateUser() {
 
       // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+
+      // Invalida también departamentos por si cambió el departamento del usuario
+      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
     },
   });
 }
@@ -79,6 +86,9 @@ export function useDeleteUser() {
 
       // Invalida todas las queries de listas de usuarios para refetch
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+
+      // Invalida también departamentos por si se eliminó un profesor
+      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
     },
   });
 }

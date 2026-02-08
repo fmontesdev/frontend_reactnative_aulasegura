@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subjectService } from '../../services/subjectService';
 import { CreateSubjectData, UpdateSubjectData, SubjectsFilters } from '../../types/Subject';
+import { departmentKeys } from './useDepartments';
 
 // Keys para el caché de React Query
 export const subjectKeys = {
@@ -42,6 +43,9 @@ export function useCreateSubject() {
     mutationFn: (data: CreateSubjectData) => subjectService.createSubject(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
+      
+      // Invalida también departamentos por si la nueva asignatura pertenece a un departamento
+      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
     },
   });
 }
@@ -56,6 +60,9 @@ export function useUpdateSubject() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
       queryClient.invalidateQueries({ queryKey: subjectKeys.detail(variables.subjectId) });
+      
+      // Invalida también departamentos por si cambió el departamento de la asignatura
+      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
     },
   });
 }
