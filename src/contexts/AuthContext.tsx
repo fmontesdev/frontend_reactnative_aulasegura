@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, useSegments } from 'expo-router';
-import { User, RoleName } from '../types/User';
+import { User } from '../types/User';
 import { authService } from '../services/authService';
 import { AuthContextType } from '../types/Auth';
 
@@ -56,12 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { user } = await authService.login({ email, password });
-
-    if (!user.roles.includes(RoleName.ADMIN)) {
-      await authService.logout();
-      throw new Error('Acceso denegado.\nSolo los administradores pueden acceder al panel');
-    }
-
     setUser(user);
   };
 

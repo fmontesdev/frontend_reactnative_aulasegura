@@ -4,7 +4,7 @@
 
 import apiService from './apiService';
 import tokenService from './tokenService';
-import { User } from '../types/User';
+import { User, RoleName } from '../types/User';
 import { AuthResponse, LoginRequest, ChangePasswordRequest } from '../types/Auth';
 
 export const authService = {
@@ -15,12 +15,19 @@ export const authService = {
       password: login.password,
     });
 
-    // Guarda los tokens automáticamente
-    await tokenService.saveTokens(response.accessToken, response.refreshToken);
-
-    // Extrae el user de la respuesta
+    // Extraer el user antes de persistir para verificar el rol
     const { accessToken, refreshToken, ...userData } = response;
-    
+
+    // Verificar rol admin ANTES de guardar tokens en storage.
+    // Si se guardaran primero y el logout fallase, quedarían tokens de un
+    // usuario no-admin persistidos en disco.
+    if (!userData.roles?.includes(RoleName.ADMIN)) {
+      throw new Error('Acceso denegado.\nSolo los administradores pueden acceder al panel');
+    }
+
+    // Solo si el rol es válido, persistir los tokens
+    await tokenService.saveTokens(accessToken, refreshToken);
+
     return { user: userData, accessToken, refreshToken };
   },
 
