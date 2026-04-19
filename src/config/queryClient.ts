@@ -21,8 +21,10 @@ export const queryClient = new QueryClient({
         return failureCount < 2;
       },
       
-      // Los datos se consideran frescos durante 1 minuto
-      // Durante este tiempo, React Query reutiliza el caché sin hacer nuevas peticiones
+      // Tiers de staleTime por tipo de dato:
+      //   60_000 (este default) — datos estáticos: usuarios, cursos, departamentos
+      //   0 + refetchInterval: 10_000 — datos en tiempo real: logs de acceso, supervisión
+      // Los hooks individuales sobreescriben este valor cuando lo necesitan.
       staleTime: 1000 * 60,
       
       // Recargar datos cuando la app vuelve al primer plano
