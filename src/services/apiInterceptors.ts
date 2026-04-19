@@ -7,6 +7,7 @@
 import axios, { InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { API_CONFIG } from '../constants';
 import tokenService from './tokenService';
+import { logger } from '../utils/logger';
 
 // Promesa compartida del refresh en proceso para evitar múltiples refresh simultáneos
 let refreshTokenPromise: Promise<string | null> | null = null;
@@ -37,7 +38,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
     return accessToken;
   } catch (error) {
-    console.error('Error refreshing token:', error);
+    logger.error('Error refreshing token:', error);
     // Si falla el refresh, elimina todos los tokens (logout)
     await tokenService.removeTokens();
     return null;
@@ -55,7 +56,7 @@ export const authInterceptor = async (
       config.headers.Authorization = `Bearer ${token}`;
     }
   } catch (error) {
-    console.error('Error adding auth token:', error);
+    logger.error('Error adding auth token:', error);
   }
   return config;
 };
@@ -66,15 +67,15 @@ export const errorInterceptor = async (error: AxiosError): Promise<AxiosResponse
 
   // Log del error
   if (error.response) {
-    console.error('API Error:', {
+    logger.error('API Error:', {
       status: error.response.status,
       data: error.response.data,
       url: originalRequest?.url,
     });
   } else if (error.request) {
-    console.error('No response received:', error.request);
+    logger.error('No response received:', error.request);
   } else {
-    console.error('Request Error:', error.message);
+    logger.error('Request Error:', error.message);
   }
 
   // Solo intenta refresh si:
@@ -107,7 +108,7 @@ export const errorInterceptor = async (error: AxiosError): Promise<AxiosResponse
         return axios(originalRequest);
       }
     } catch (refreshError) {
-      console.error('Refresh token failed:', refreshError);
+      logger.error('Refresh token failed:', refreshError);
     }
   }
 
