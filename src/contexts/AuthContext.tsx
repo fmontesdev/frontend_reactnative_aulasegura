@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { useRouter, useSegments } from 'expo-router';
 import { User } from '../types/User';
 import { authService } from '../services/authService';
@@ -17,10 +17,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   // Obtiene en un array los segmentos de la ruta actual (las partes de la URL divididas por /)
   const segments = useSegments();
+  const authChannel = useRef<BroadcastChannel | null>(null);
 
   // Verifica autenticación al montar la app
   useEffect(() => {
     checkAuthStatus();
+  }, []);
+
+  // Sincronización de logout entre tabs via BroadcastChannel
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    authChannel.current = new BroadcastChannel('auth');
+    authChannel.current.onmessage = (e: MessageEvent) => {
+      if (e.data?.type === 'logout') {
+        setUser(null);
+      }
+    };
+
+    return () => {
+      authChannel.current?.close();
+      authChannel.current = null;
+    };
   }, []);
 
   // Protección automática de rutas cuando cambia el estado de autenticación
@@ -65,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await authService.logout();
+    authChannel.current?.postMessage({ type: 'logout' });
     setUser(null);
   };
 
