@@ -66,7 +66,7 @@ const apiService = {
   },
 
   // POST request
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     try {
       const instance = getApiInstance();
       const response = await instance.post<T>(url, data, config);
@@ -77,7 +77,7 @@ const apiService = {
   },
 
   // PUT request
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     try {
       const instance = getApiInstance();
       const response = await instance.put<T>(url, data, config);
@@ -88,7 +88,7 @@ const apiService = {
   },
 
   // PATCH request
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     try {
       const instance = getApiInstance();
       const response = await instance.patch<T>(url, data, config);
@@ -99,7 +99,7 @@ const apiService = {
   },
 
   // Update con PATCH request con ID en la URL
-  async update<T>(url: string, id: string | number, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async update<T>(url: string, id: string | number, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     return this.patch<T>(`${url}/${id}`, data, config);
   },
 

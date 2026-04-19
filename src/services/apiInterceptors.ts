@@ -4,7 +4,7 @@
  * - errorInterceptor: Maneja errores 401 y refresca tokens automáticamente
  */
 
-import axios, { InternalAxiosRequestConfig, AxiosError } from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { API_CONFIG } from '../constants';
 import tokenService from './tokenService';
 
@@ -61,7 +61,7 @@ export const authInterceptor = async (
 };
 
 // Interceptor de errores: maneja 401 y refresca tokens automáticamente
-export const errorInterceptor = async (error: AxiosError): Promise<any> => {
+export const errorInterceptor = async (error: AxiosError): Promise<AxiosResponse> => {
   const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
   // Log del error

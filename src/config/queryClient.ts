@@ -10,12 +10,12 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Reintentar hasta 2 veces ante fallos (útil en mobile con mala conexión)
-      retry: (failureCount, error: any) => {
+      retry: (failureCount: number, error: unknown) => {
         // No reintentar errores de autenticación
-        if (error?.response?.status === 401) return false;
+        if (isApiError(error) && error.status === 401) return false;
         
         // No reintentar errores de validación (4xx excepto 401)
-        if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+        if (isApiError(error) && error.status >= 400 && error.status < 500) return false;
         
         // Reintentar hasta 2 veces para errores de red o servidor (5xx)
         return failureCount < 2;

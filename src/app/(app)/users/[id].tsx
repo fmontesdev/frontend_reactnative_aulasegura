@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Text, IconButton } from 'react-native-paper';
 import { useAppTheme } from '../../../theme';
-import { UserForm } from '../../../components/UserForm';
+import { EditUserForm } from '../../../components/UserForm/EditUserForm';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
 import { useUser, useUpdateUser } from '../../../hooks/queries/useUsers';
 import { UserEditFormData } from '../../../schemas/user.schema';
@@ -21,7 +21,7 @@ export default function EditUserScreen() {
   const { data: user, isLoading, error } = useUser(id);
   const updateUser = useUpdateUser();
 
-  const handleSubmit = async (data: UserEditFormData) => {
+  const handleSubmit = async (data: Partial<UserEditFormData>) => {
     if (!id) return;
 
     try {
@@ -31,7 +31,7 @@ export default function EditUserScreen() {
       setSnackbarVisible(true);
       // Navegar de vuelta después de un breve delay para mostrar el snackbar
       setTimeout(() => router.back(), 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setSnackbarMessage(
         error instanceof Error ? error.message : 'Error al actualizar el usuario'
       );
@@ -83,8 +83,7 @@ export default function EditUserScreen() {
         </Text>
         </View>
 
-        <UserForm
-          mode="edit"
+        <EditUserForm
           initialData={user}
           onSubmit={handleSubmit}
           isLoading={updateUser.isPending}
