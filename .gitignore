@@ -40,3 +40,14 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local agent folders/files
+.agents/
+.claude/
+.atl/
+AGENTS.md
+skills-lock.json
+
+# documentation
+docs/
+nginx.conf
