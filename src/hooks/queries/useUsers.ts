@@ -29,8 +29,8 @@ export function useUsers(filters?: UsersFilters) {
 // Hook para contar usuarios activos usando el filtro del backend
 export function useActiveUsersCount() {
   return useQuery({
-    queryKey: userKeys.list({ filters: ['estado:activo'] }),
-    queryFn: () => userService.getAllUsers({ filters: ['estado:activo'] }),
+    queryKey: ['users', 'active-count'] as const, // key única — nunca colisiona con userKeys.list
+    queryFn: () => userService.getAllUsers({ filters: ['estado:activo'], limit: 1 }),
     staleTime: 1000 * 60 * 5,
     select: (data) => data.meta.total,
   });
