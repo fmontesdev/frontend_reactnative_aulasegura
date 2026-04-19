@@ -71,9 +71,9 @@ export default function HomeScreen() {
 
         {/* KPIs */}
         <View style={styles.kpiContainer}>
-          {kpiDataWithRealValues.map((kpi, index) => (
+          {kpiDataWithRealValues.map((kpi) => (
             <KPICard
-              key={index}
+              key={kpi.route}
               title={kpi.title}
               value={kpi.value}
               icon={kpi.icon}
@@ -130,9 +130,9 @@ export default function HomeScreen() {
               Acciones rápidas
             </Text>
             <View style={styles.actionsGrid}>
-              {quickActions.map((action, index) => (
+              {quickActions.map((action) => (
                 <QuickActionButton
-                  key={index}
+                  key={action.route}
                   title={action.title}
                   icon={action.icon}
                   color={action.color}
