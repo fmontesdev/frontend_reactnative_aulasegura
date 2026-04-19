@@ -13,6 +13,7 @@ import { DepartmentBasic } from '../../types/Department';
 import { Course } from '../../types/Course';
 import { useDepartments } from '../../hooks/queries/useDepartments';
 import { useCourses } from '../../hooks/queries/useCourses';
+import { getChangedFields } from '../../utils/formUtils';
 import { styles } from './SubjectForm.styles';
 
 interface SubjectFormProps {
@@ -47,29 +48,19 @@ export function SubjectForm({ mode, initialData, onSubmit, isLoading = false }: 
         }
   });
 
-  // Obtener solo los campos modificados en modo edición
-  const getChangedFields = (data: SubjectFormData): Partial<SubjectFormData> => {
-    if (!initialData) return data;
-
-    const changedFields: Partial<SubjectFormData> = {};
-
-    if (data.subjectCode !== initialData.subjectCode) changedFields.subjectCode = data.subjectCode;
-    if (data.name !== initialData.name) changedFields.name = data.name;
-    if (data.departmentId !== initialData.department.departmentId) changedFields.departmentId = data.departmentId;
-    
-    const currentCourseIds = initialData.courses.map(c => c.courseId).sort();
-    const newCourseIds = data.courseIds.sort();
-    if (JSON.stringify(currentCourseIds) !== JSON.stringify(newCourseIds)) {
-      changedFields.courseIds = data.courseIds;
-    }
-
-    return changedFields;
-  };
-
   // Función principal de submit
   const handleFormSubmit = async (data: SubjectFormData) => {
     if (mode === 'edit' && initialData) {
-      const changedFields = getChangedFields(data);
+      const normalizedInitial: Record<string, unknown> = {
+        subjectCode: initialData.subjectCode,
+        name: initialData.name,
+        departmentId: initialData.department.departmentId,
+        courseIds: initialData.courses.map(c => c.courseId),
+      };
+      const changedFields = getChangedFields(
+        data as unknown as Record<string, unknown>,
+        normalizedInitial,
+      );
       await onSubmit(changedFields as any);
     } else {
       await onSubmit(data as any);

@@ -11,6 +11,7 @@ import { FormTextInput } from '../FormTextInput';
 import { useAppTheme } from '../../theme';
 import { DepartmentFormSchema, DepartmentFormData } from '../../schemas/department.schema';
 import { Department } from '../../types/Department';
+import { getChangedFields } from '../../utils/formUtils';
 import { styles } from './DepartmentForm.styles';
 
 interface DepartmentFormProps {
@@ -35,21 +36,16 @@ export function DepartmentForm({ mode, initialData, onSubmit, isLoading = false 
         }
   });
 
-  // Obtener solo los campos modificados en modo edición
-  const getChangedFields = (data: DepartmentFormData): Partial<DepartmentFormData> => {
-    if (!initialData) return data;
-
-    const changedFields: Partial<DepartmentFormData> = {};
-
-    if (data.name !== initialData.name) changedFields.name = data.name;
-
-    return changedFields;
-  };
-
   // Función principal de submit
   const handleFormSubmit = async (data: DepartmentFormData) => {
     if (mode === 'edit' && initialData) {
-      const changedFields = getChangedFields(data);
+      const normalizedInitial: Record<string, unknown> = {
+        name: initialData.name,
+      };
+      const changedFields = getChangedFields(
+        data as unknown as Record<string, unknown>,
+        normalizedInitial,
+      );
       await onSubmit(changedFields as any);
     } else {
       await onSubmit(data as any);
