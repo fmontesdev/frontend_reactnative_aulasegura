@@ -20,13 +20,13 @@ export default function CreateUserScreen() {
   const handleSubmit = async (data: UserCreateFormData) => {
     try {
       const newUser = await createUser.mutateAsync(data);
-      setSnackbarMessage('Curso creado exitosamente');
+      setSnackbarMessage('Usuario creado exitosamente');
       setSnackbarType('success');
       setSnackbarVisible(true);
       // Navegar de vuelta después de un breve delay para mostrar el snackbar
       setTimeout(() => router.back(), 1500);
       return newUser;
-    } catch (error: any) {
+    } catch (error: unknown) {
       setSnackbarMessage(
         error instanceof Error ? error.message : 'Error al crear el usuario'
       );
@@ -65,7 +65,7 @@ export default function CreateUserScreen() {
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
         message={snackbarMessage}
-        variant="error"
+        variant={snackbarType}
         action={{
           label: 'Cerrar',
           onPress: () => setSnackbarVisible(false),
