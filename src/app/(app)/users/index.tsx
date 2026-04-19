@@ -14,6 +14,7 @@ import { TooltipWrapper } from '../../../components/TooltipWrapper';
 import { User } from '../../../types/User';
 import { getRoleLabel, getRoleColor } from '../../../utils/roleUtils';
 import { addOpacity } from '../../../utils/colorUtils';
+import { isUserActive } from '../../../utils/userUtils';
 import { getUsersColumns } from './columns.config.users';
 import { styles } from './users.styles';
 import { isApiError } from '../../../errors/ApiError';
@@ -81,13 +82,6 @@ export default function UsersScreen() {
   const handleDeleteCancel = () => {
     setDeleteDialogVisible(false);
     setUserToDelete(null);
-  };
-
-  const isUserActive = (user: User) => {
-    if (!user.validTo) return true;
-    const now = new Date();
-    const validTo = new Date(user.validTo);
-    return validTo > now;
   };
 
   const columns = getUsersColumns(isUserActive);
