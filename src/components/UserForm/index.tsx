@@ -16,6 +16,7 @@ import { User, RoleName } from '../../types/User';
 import { useDepartments } from '../../hooks/queries/useDepartments';
 import { getRoleLabel } from '../../utils/roleUtils';
 import { styles } from './UserForm.styles';
+import { isApiError } from '../../errors/ApiError';
 
 interface UserFormProps {
   mode: 'create' | 'edit';
@@ -30,6 +31,7 @@ export function UserForm({ mode, initialData, onSubmit, isLoading = false }: Use
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarVariant, setSnackbarVariant] = useState<'warning' | 'error'>('warning');
   const [hasValidTo, setHasValidTo] = useState(!!initialData?.validTo);
   const avatarPickerRef = useRef<AvatarPickerRef | null>(null);
   const isSubmitting = isLoading;
@@ -101,35 +103,42 @@ export function UserForm({ mode, initialData, onSubmit, isLoading = false }: Use
     const selectedFile = avatarPickerRef.current?.selectedFile;
     const hasCustomAvatar = selectedFile && data.avatar === '__preview__';
 
-    if (mode === 'edit' && initialData) {
-      // MODO EDIT: Subir avatar primero si hay archivo pendiente
-      if (hasCustomAvatar) {
-        const uploadedAvatar = await avatarPickerRef.current?.uploadAvatar(initialData.userId);
-        if (!uploadedAvatar) return; // Error al subir, no continuar
-        data.avatar = uploadedAvatar;
-      }
-      
-      const changedFields = getChangedFields(data as UserEditFormData);
-      await onSubmit(changedFields as UserEditFormData);
-    } else {
-      // MODO CREATE
-      if (hasCustomAvatar) {
-        // Crear usuario con avatar predeterminado
-        data.avatar = 'avatar.png';
-        const createdUser = await onSubmit(data);
-        
-        // Subir avatar personalizado (no bloqueante)
-        if (createdUser?.userId) {
-          const uploadedAvatar = await avatarPickerRef.current?.uploadAvatar(createdUser.userId);
-          if (!uploadedAvatar) {
-            setSnackbarMessage('Usuario creado, pero no se pudo subir el avatar');
-            setSnackbarVisible(true);
-          }
+    try {
+      if (mode === 'edit' && initialData) {
+        // MODO EDIT: Subir avatar primero si hay archivo pendiente
+        if (hasCustomAvatar) {
+          const uploadedAvatar = await avatarPickerRef.current?.uploadAvatar(initialData.userId);
+          if (!uploadedAvatar) return; // Error al subir, no continuar
+          data.avatar = uploadedAvatar;
         }
+        
+        const changedFields = getChangedFields(data as UserEditFormData);
+        await onSubmit(changedFields as UserEditFormData);
       } else {
-        // Sin avatar personalizado
-        await onSubmit(data);
+        // MODO CREATE
+        if (hasCustomAvatar) {
+          // Crear usuario con avatar predeterminado
+          data.avatar = 'avatar.png';
+          const createdUser = await onSubmit(data);
+          
+          // Subir avatar personalizado (no bloqueante)
+          if (createdUser?.userId) {
+            const uploadedAvatar = await avatarPickerRef.current?.uploadAvatar(createdUser.userId);
+            if (!uploadedAvatar) {
+              setSnackbarMessage('Usuario creado, pero no se pudo subir el avatar');
+              setSnackbarVisible(true);
+            }
+          }
+        } else {
+          // Sin avatar personalizado
+          await onSubmit(data);
+        }
       }
+    } catch (e: unknown) {
+      const msg = isApiError(e) ? e.message : 'Error inesperado al guardar';
+      setSnackbarMessage(msg);
+      setSnackbarVariant('error');
+      setSnackbarVisible(true);
     }
   };
 
@@ -290,7 +299,7 @@ export function UserForm({ mode, initialData, onSubmit, isLoading = false }: Use
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
         message={snackbarMessage}
-        variant="warning"
+        variant={snackbarVariant}
         action={{
           label: 'Cerrar',
           onPress: () => setSnackbarVisible(false),
