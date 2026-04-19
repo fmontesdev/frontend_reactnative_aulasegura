@@ -10,6 +10,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { API_CONFIG } from '../constants';
 import { authInterceptor, errorInterceptor } from './apiInterceptors';
+import { ApiError } from '../errors/ApiError';
 
 // Instancia singleton para NestJS
 let apiInstance: AxiosInstance | null = null;
@@ -37,16 +38,17 @@ function getApiInstance(): AxiosInstance {
   return apiInstance;
 }
 
+type NestErrorResponse = { statusCode: number; message: string | string[]; error?: string };
+
 // Manejo centralizado de errores
-const handleError = (error: any): never => {
-  // Se puede personalizar el manejo de errores
-  // Por ejemplo, mostrar notificaciones, redirigir al login en 401, etc.
-  
+const handleError = (error: unknown): never => {
   if (axios.isAxiosError(error)) {
-    const message = error.response?.data?.message || error.message || 'An error occurred';
-    throw new Error(message);
+    const data = error.response?.data as NestErrorResponse | undefined;
+    const rawMsg = data?.message ?? error.message ?? 'An error occurred';
+    const message = Array.isArray(rawMsg) ? rawMsg.join('. ') : rawMsg;
+    const status = error.response?.status ?? 0;
+    throw new ApiError(message, status, data ?? { statusCode: status, message: rawMsg });
   }
-  
   throw error;
 };
 

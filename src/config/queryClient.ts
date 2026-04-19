@@ -3,6 +3,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
+import { isApiError } from '../errors/ApiError';
 
 // Cliente de React Query
 export const queryClient = new QueryClient({
@@ -36,7 +37,10 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       // Reintentar mutations solo una vez
-      retry: 1,
+      retry: (failureCount: number, error: unknown) => {
+        if (isApiError(error) && error.status >= 400 && error.status < 500) return false;
+        return failureCount < 1;
+      },
     },
   },
 });
