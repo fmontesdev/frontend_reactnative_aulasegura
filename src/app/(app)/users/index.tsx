@@ -16,6 +16,8 @@ import { getRoleLabel, getRoleColor } from '../../../utils/roleUtils';
 import { addOpacity } from '../../../utils/colorUtils';
 import { getUsersColumns } from './columns.config.users';
 import { styles } from './users.styles';
+import { isApiError } from '../../../errors/ApiError';
+import { StyledSnackbar } from '../../../components/StyledSnackbar';
 
 // Pantalla de gestión de usuarios
 export default function UsersScreen() {
@@ -25,6 +27,9 @@ export default function UsersScreen() {
   const { page: currentPage, limit: currentLimit, setPage, setLimit } = usePaginationParams({ filters });
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [deleteSnackbarVisible, setDeleteSnackbarVisible] = useState(false);
+  const [deleteSnackbarMessage, setDeleteSnackbarMessage] = useState('');
+  const [deleteSnackbarVariant, setDeleteSnackbarVariant] = useState<'success' | 'error'>('error');
 
   // Hook de TanStack Query para obtener todos los usuarios
   const { data: usersResponse, isLoading, error, isFetching, refetch } = useUsers({
@@ -57,13 +62,19 @@ export default function UsersScreen() {
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
-
     try {
       await deleteUser.mutateAsync(userToDelete.userId);
+      setDeleteSnackbarMessage('Usuario eliminado correctamente');
+      setDeleteSnackbarVariant('success');
+      setDeleteSnackbarVisible(true);
+    } catch (e: unknown) {
+      const msg = isApiError(e) ? e.message : 'Error al eliminar el usuario';
+      setDeleteSnackbarMessage(msg);
+      setDeleteSnackbarVariant('error');
+      setDeleteSnackbarVisible(true);
+    } finally {
       setDeleteDialogVisible(false);
       setUserToDelete(null);
-    } catch (error) {
-      console.error('Error deleting user:', error);
     }
   };
 
@@ -243,6 +254,14 @@ export default function UsersScreen() {
         cancelText="Cancelar"
         isLoading={deleteUser.isPending}
         variant="danger"
+      />
+
+      <StyledSnackbar
+        visible={deleteSnackbarVisible}
+        onDismiss={() => setDeleteSnackbarVisible(false)}
+        message={deleteSnackbarMessage}
+        variant={deleteSnackbarVariant}
+        action={{ label: 'Cerrar', onPress: () => setDeleteSnackbarVisible(false) }}
       />
     </View>
   );
