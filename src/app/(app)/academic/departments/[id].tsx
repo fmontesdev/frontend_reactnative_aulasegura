@@ -32,7 +32,7 @@ export default function EditDepartmentScreen() {
       setSnackbarType('success');
       setSnackbarVisible(true);
       setTimeout(() => router.back(), 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setSnackbarMessage(
         error instanceof Error ? error.message : 'Error al actualizar el departamento'
       );

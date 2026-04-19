@@ -33,7 +33,7 @@ export default function EditSubjectScreen() {
       setSnackbarVisible(true);
       // Navegar de vuelta después de un breve delay para mostrar el snackbar
       setTimeout(() => router.back(), 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setSnackbarMessage(
         error instanceof Error ? error.message : 'Error al actualizar la asignatura'
       );

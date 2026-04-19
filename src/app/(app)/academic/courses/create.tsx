@@ -25,7 +25,7 @@ export default function CreateCourseScreen() {
       setSnackbarVisible(true);
       // Navegar de vuelta después de un breve delay para mostrar el snackbar
       setTimeout(() => router.back(), 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setSnackbarMessage(
         error instanceof Error ? error.message : 'Error al crear el curso'
       );
