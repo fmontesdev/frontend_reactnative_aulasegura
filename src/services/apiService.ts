@@ -15,12 +15,13 @@ import { ApiError } from '../errors/ApiError';
 // Instancia singleton para NestJS
 let apiInstance: AxiosInstance | null = null;
 
-// Obtiene o crea la instancia de Axios para el backend NestJS
+// Obtiene o crea la instancia de Axios para el backend NestJS (con credenciales para cookies httpOnly)
 function getApiInstance(): AxiosInstance {
   if (!apiInstance) {
     apiInstance = axios.create({
       baseURL: API_CONFIG.NESTJS_API_URL,
       timeout: API_CONFIG.API_TIMEOUT,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },

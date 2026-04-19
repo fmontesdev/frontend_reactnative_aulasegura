@@ -15,7 +15,6 @@ export interface AuthContextType {
 // Respuesta del login/refresh
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
   userId: string;
   name: string;
   lastname: string;

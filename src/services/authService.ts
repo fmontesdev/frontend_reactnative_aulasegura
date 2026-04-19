@@ -6,61 +6,51 @@ import apiService from './apiService';
 import tokenService from './tokenService';
 import { User, RoleName } from '../types/User';
 import { AuthResponse, LoginRequest, ChangePasswordRequest } from '../types/Auth';
+import { logger } from '../utils/logger';
 
 export const authService = {
   // Inicia sesión con email y contraseña
-  async login(login: LoginRequest): Promise<{ user: User; accessToken: string; refreshToken: string }> {
+  async login(login: LoginRequest): Promise<{ user: User; accessToken: string }> {
     const response = await apiService.post<AuthResponse>('/auth/login', {
       email: login.email,
       password: login.password,
     });
 
-    // Extraer el user antes de persistir para verificar el rol
-    const { accessToken, refreshToken, ...userData } = response;
+    // Extrae el user antes de persistir para verificar el rol
+    const { accessToken, ...userData } = response;
 
-    // Verificar rol admin ANTES de guardar tokens en storage.
-    // Si se guardaran primero y el logout fallase, quedarían tokens de un
-    // usuario no-admin persistidos en disco.
+    // Verifica el rol admin ANTES de guardar el accessToken para evitar persistir tokens de usuarios no autorizados
     if (!userData.roles?.includes(RoleName.ADMIN)) {
       throw new Error('Acceso denegado.\nSolo los administradores pueden acceder al panel');
     }
 
-    // Solo si el rol es válido, persistir los tokens
-    await tokenService.saveTokens(accessToken, refreshToken);
+    // Solo si el rol es válido, persistir el accessToken
+    await tokenService.saveAccessToken(accessToken);
 
-    return { user: userData, accessToken, refreshToken };
+    return { user: userData, accessToken };
   },
 
-  // Refresca el access token usando el refresh token
-  async refreshToken(refreshToken: string): Promise<{ user: User; accessToken: string; refreshToken: string }> {
-    const response = await apiService.post<AuthResponse>('/auth/refresh', {
-      refreshToken,
-    });
+  // Refresca el access token usando la cookie refreshToken
+  async refreshToken(): Promise<{ user: User; accessToken: string }> {
+    const response = await apiService.post<AuthResponse>('/auth/refresh');
 
-    // Guarda los nuevos tokens
-    await tokenService.saveTokens(response.accessToken, response.refreshToken);
+    // Guarda el nuevo accessToken
+    await tokenService.saveAccessToken(response.accessToken);
 
-    // Extrae el user de la respuesta
-    const { accessToken: newAccessToken, refreshToken: newRefreshToken, ...userData } = response;
-    
-    return { user: userData, accessToken: newAccessToken, refreshToken: newRefreshToken };
+    // Extrae el user  de la respuesta para devolverlo junto al nuevo accessToken
+    const { accessToken, ...userData } = response;
+    return { user: userData, accessToken };
   },
 
-  // Logout del usuario. Invalida el refresh token en el backend y limpia el storage local
+  // Cierra la sesión del usuario usando la cookie refreshToken y limpia el accessToken local
   async logout(): Promise<void> {
     try {
-      const refreshToken = await tokenService.getRefreshToken();
-      
-      if (refreshToken) {
-        // Intenta invalidar el token en el backend
-        await apiService.post('/auth/logout', { refreshToken });
-      }
+      await apiService.post('/auth/logout');
     } catch (error) {
-      console.error('Error during logout:', error);
-      // Continúa con el logout local aunque falle el backend
+      logger.error('Error during logout:', error);
     } finally {
-      // Siempre limpia los tokens locales
-      await tokenService.removeTokens();
+      // Siempre limpia el accessToken local
+      await tokenService.removeAccessToken();
     }
   },
 

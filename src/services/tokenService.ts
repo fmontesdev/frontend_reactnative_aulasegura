@@ -1,7 +1,7 @@
 /**
  * Servicio de almacenamiento multiplataforma de tokens para autenticación JWT
- * - iOS/Android: expo-secure-store (cifrado)
- * - Web: localStorage
+ * - Web: access token en variable de módulo (memoria). Refresh token: httpOnly cookie (browser lo gestiona)
+ * - iOS/Android: expo-secure-store (cifrado) para ambos tokens
  */
 
 import * as SecureStore from 'expo-secure-store';
@@ -9,69 +9,81 @@ import { Platform } from 'react-native';
 
 const isWeb = Platform.OS === 'web';
 
-// Factory para crear métodos de token específicos
-const createTokenMethods = (key: string) => {
-  const methods = {
-    async save(token: string): Promise<void> {
-      try {
-        isWeb ? localStorage.setItem(key, token) : await SecureStore.setItemAsync(key, token);
-      } catch (error) {
-        console.error(`Error saving token (${key}):`, error);
-        throw new Error(`Failed to save token`);
-      }
-    },
-
-    async get(): Promise<string | null> {
-      try {
-        return isWeb ? localStorage.getItem(key) : await SecureStore.getItemAsync(key);
-      } catch (error) {
-        console.error(`Error getting token (${key}):`, error);
-        return null;
-      }
-    },
-
-    async remove(): Promise<void> {
-      try {
-        isWeb ? localStorage.removeItem(key) : await SecureStore.deleteItemAsync(key);
-      } catch (error) {
-        console.error(`Error removing token (${key}):`, error);
-        throw new Error(`Failed to remove token`);
-      }
-    },
-
-    async has(): Promise<boolean> {
-      const value = await methods.get();
-      return value !== null && value !== '';
-    },
-  };
-
-  return methods;
-};
-
-// Crear métodos para cada tipo de token
-const accessToken = createTokenMethods('access_token');
-const refreshToken = createTokenMethods('refresh_token');
+// Web: access token en memoria (nunca en localStorage)
+let _accessToken: string | null = null;
 
 const tokenService = {
-  // Access Token
-  saveAccessToken: accessToken.save,
-  getAccessToken: accessToken.get,
-  removeAccessToken: accessToken.remove,
-  hasAccessToken: accessToken.has,
+  async saveAccessToken(token: string): Promise<void> {
+    if (isWeb) {
+      _accessToken = token;
+    } else {
+      await SecureStore.setItemAsync('access_token', token);
+    }
+  },
 
-  // Refresh Token
-  saveRefreshToken: refreshToken.save,
-  getRefreshToken: refreshToken.get,
-  removeRefreshToken: refreshToken.remove,
-  hasRefreshToken: refreshToken.has,
+  async getAccessToken(): Promise<string | null> {
+    if (isWeb) {
+      return _accessToken;
+    }
+    return SecureStore.getItemAsync('access_token');
+  },
 
-  // Operaciones combinadas
+  async removeAccessToken(): Promise<void> {
+    if (isWeb) {
+      _accessToken = null;
+    } else {
+      await SecureStore.deleteItemAsync('access_token');
+    }
+  },
+
+  async hasAccessToken(): Promise<boolean> {
+    const token = await tokenService.getAccessToken();
+    return token !== null && token !== '';
+  },
+
+  // Web: no-ops — el browser gestiona el refreshToken como httpOnly cookie
+  // Native: SecureStore
+  async saveRefreshToken(token: string): Promise<void> {
+    if (isWeb) return;
+    await SecureStore.setItemAsync('refresh_token', token);
+  },
+
+  async getRefreshToken(): Promise<string | null> {
+    if (isWeb) return null;
+    return SecureStore.getItemAsync('refresh_token');
+  },
+
+  async removeRefreshToken(): Promise<void> {
+    if (isWeb) return;
+    await SecureStore.deleteItemAsync('refresh_token');
+  },
+
+  async hasRefreshToken(): Promise<boolean> {
+    if (isWeb) return false;
+    const value = await SecureStore.getItemAsync('refresh_token');
+    return value !== null && value !== '';
+  },
+
   async saveTokens(access: string, refresh: string): Promise<void> {
-    await Promise.all([accessToken.save(access), refreshToken.save(refresh)]);
+    if (isWeb) {
+      _accessToken = access;
+    } else {
+      await Promise.all([
+        SecureStore.setItemAsync('access_token', access),
+        SecureStore.setItemAsync('refresh_token', refresh),
+      ]);
+    }
   },
 
   async removeTokens(): Promise<void> {
-    await Promise.all([accessToken.remove(), refreshToken.remove()]);
+    if (isWeb) {
+      _accessToken = null;
+    } else {
+      await Promise.all([
+        SecureStore.deleteItemAsync('access_token'),
+        SecureStore.deleteItemAsync('refresh_token'),
+      ]);
+    }
   },
 };
 

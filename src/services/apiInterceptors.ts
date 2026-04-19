@@ -12,35 +12,28 @@ import { logger } from '../utils/logger';
 // Promesa compartida del refresh en proceso para evitar múltiples refresh simultáneos
 let refreshTokenPromise: Promise<string | null> | null = null;
 
-// Refresca el access token usando el refresh token
+// Refresca el access token usando el refresh token (cookie httpOnly — el browser la envía automáticamente)
 const refreshAccessToken = async (): Promise<string | null> => {
   try {
-    const refreshToken = await tokenService.getRefreshToken();
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    // Hace petición directa al endpoint de refresh (sin interceptores)
+    // El refresh token viaja como httpOnly cookie, el body va vacío
     const response = await axios.post(
       `${API_CONFIG.NESTJS_API_URL}/auth/refresh`,
-      { refreshToken },
+      {},
       {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
       }
     );
 
-    const { accessToken, refreshToken: newRefreshToken } = response.data;
+    const { accessToken } = response.data;
 
-    // Guarda los nuevos tokens
-    await tokenService.saveTokens(accessToken, newRefreshToken);
+    await tokenService.saveAccessToken(accessToken);
 
     return accessToken;
   } catch (error) {
     logger.error('Error refreshing token:', error);
-    // Si falla el refresh, elimina todos los tokens (logout)
-    await tokenService.removeTokens();
+    // Si el refresh falla, limpia el access token para forzar login
+    await tokenService.removeAccessToken();
     return null;
   }
 };
