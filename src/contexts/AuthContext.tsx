@@ -42,12 +42,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuthStatus = async () => {
     try {
       const isAuth = await authService.isAuthenticated();
-      if (isAuth) {
-        const currentUser = await authService.getCurrentUser();
-        setUser(currentUser);
+      if (!isAuth) {
+        // Web: el access token vive en memoria y se pierde al recargar la página
+        // Intentar silent refresh — si la httpOnly cookie sigue siendo válida,
+        // el backend devuelve un nuevo accessToken y el usuario no ve el login
+        await authService.refreshToken();
       }
-    } catch (error) {
-      console.error('Error checking auth status:', error);
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
+    } catch {
+      // Sin token en memoria ni cookie válida, el usuario debe autenticarse
       setUser(null);
     } finally {
       setIsLoading(false);
