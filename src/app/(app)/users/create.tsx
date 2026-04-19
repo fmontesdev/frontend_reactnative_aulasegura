@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../../theme';
-import { UserForm } from '../../../components/UserForm';
+import { CreateUserForm } from '../../../components/UserForm/CreateUserForm';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
 import { useCreateUser } from '../../../hooks/queries/useUsers';
 import { UserCreateFormData } from '../../../schemas/user.schema';
@@ -32,7 +32,7 @@ export default function CreateUserScreen() {
       );
       setSnackbarType('error');
       setSnackbarVisible(true);
-      throw error; // Re-lanza para UserForm
+      throw error; // Re-lanza para CreateUserForm
     }
   };
 
@@ -55,8 +55,7 @@ export default function CreateUserScreen() {
         </Text>
       </View>
 
-      <UserForm
-        mode="create"
+      <CreateUserForm
         onSubmit={handleSubmit}
         isLoading={createUser.isPending}
       />
