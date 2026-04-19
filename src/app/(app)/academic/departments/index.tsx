@@ -16,6 +16,7 @@ import { Department } from '../../../../types/Department';
 import { getDepartmentsColumns } from './columns.config.departments';
 import { addOpacity } from '../../../../utils/colorUtils';
 import { styles } from './departments.styles';
+import { ErrorState } from '../../../../components/ErrorState';
 
 // Pantalla de gestión de departamentos
 export default function DepartmentsScreen() {
@@ -123,16 +124,7 @@ export default function DepartmentsScreen() {
   }
 
   if (error) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar departamentos
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'Error desconocido'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar departamentos" onRetry={refetch} />;
   }
 
   return (

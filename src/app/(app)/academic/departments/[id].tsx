@@ -7,6 +7,7 @@ import { useDepartmentById, useUpdateDepartment } from '../../../../hooks/querie
 import { DepartmentForm } from '../../../../components/DepartmentForm';
 import { DepartmentFormData } from '../../../../schemas/department.schema';
 import { StyledSnackbar } from '../../../../components/StyledSnackbar';
+import { ErrorState } from '../../../../components/ErrorState';
 
 // Pantalla para editar un departamento existente
 export default function EditDepartmentScreen() {
@@ -19,7 +20,7 @@ export default function EditDepartmentScreen() {
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
 
   // Obtener datos del departamento
-  const { data: department, isLoading, error } = useDepartmentById(departmentId);
+  const { data: department, isLoading, error, refetch } = useDepartmentById(departmentId);
   const updateDepartment = useUpdateDepartment();
 
   const handleSubmit = async (data: Partial<DepartmentFormData>) => {
@@ -52,16 +53,7 @@ export default function EditDepartmentScreen() {
   }
 
   if (error || !department) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar el departamento
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'El departamento no existe'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar el departamento" onRetry={refetch} />;
   }
 
   return (

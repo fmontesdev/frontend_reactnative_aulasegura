@@ -19,6 +19,7 @@ import { getUsersColumns } from './columns.config.users';
 import { styles } from './users.styles';
 import { isApiError } from '../../../errors/ApiError';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
+import { ErrorState } from '../../../components/ErrorState';
 
 // Pantalla de gestión de usuarios
 export default function UsersScreen() {
@@ -98,16 +99,7 @@ export default function UsersScreen() {
   }
 
   if (error) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar usuarios
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'Error desconocido'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar usuarios" onRetry={refetch} />;
   }
 
   return (

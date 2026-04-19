@@ -6,6 +6,7 @@ import { useAppTheme } from '../../../../theme';
 import { useSubject, useUpdateSubject } from '../../../../hooks/queries/useSubjects';
 import { SubjectForm } from '../../../../components/SubjectForm';
 import { StyledSnackbar } from '../../../../components/StyledSnackbar';
+import { ErrorState } from '../../../../components/ErrorState';
 import { SubjectFormData } from '../../../../schemas/subject.schema';
 
 // Pantalla para editar una asignatura existente
@@ -19,7 +20,7 @@ export default function EditSubjectScreen() {
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
 
   // Obtener datos de la asignatura
-  const { data: subject, isLoading, error } = useSubject(subjectId);
+  const { data: subject, isLoading, error, refetch } = useSubject(subjectId);
   const updateSubject = useUpdateSubject();
 
   const handleSubmit = async (data: SubjectFormData) => {
@@ -53,16 +54,7 @@ export default function EditSubjectScreen() {
   }
 
   if (error || !subject) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar la asignatura
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'La asignatura no existe'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar la asignatura" onRetry={refetch} />;
   }
 
   return (

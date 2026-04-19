@@ -7,6 +7,7 @@ import { useCourse, useUpdateCourse } from '../../../../hooks/queries/useCourses
 import { CourseForm } from '../../../../components/CourseForm';
 import { CourseFormData } from '../../../../schemas/course.schema';
 import { StyledSnackbar } from '../../../../components/StyledSnackbar';
+import { ErrorState } from '../../../../components/ErrorState';
 
 // Pantalla para editar un curso existente
 export default function EditCourseScreen() {
@@ -57,16 +58,7 @@ export default function EditCourseScreen() {
   }
 
   if (error || !course) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar el curso
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'El curso no existe'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar el curso" onRetry={refetch} />;
   }
 
   return (

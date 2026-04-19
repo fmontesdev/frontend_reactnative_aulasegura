@@ -16,6 +16,7 @@ import { Subject } from '../../../../types/Subject';
 import { getSubjectsColumns } from './columns.config.subjects';
 import { addOpacity } from '../../../../utils/colorUtils';
 import { styles } from './subjects.styles';
+import { ErrorState } from '../../../../components/ErrorState';
 
 // Pantalla de gestión de asignaturas
 export default function SubjectsScreen() {
@@ -123,16 +124,7 @@ export default function SubjectsScreen() {
   }
 
   if (error) {
-    return (     
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar asignaturas
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'Error desconocido'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar asignaturas" onRetry={refetch} />;
   }
 
   return (

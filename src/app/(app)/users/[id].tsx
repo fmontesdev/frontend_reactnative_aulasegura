@@ -5,6 +5,7 @@ import { ActivityIndicator, Text, IconButton } from 'react-native-paper';
 import { useAppTheme } from '../../../theme';
 import { EditUserForm } from '../../../components/UserForm/EditUserForm';
 import { StyledSnackbar } from '../../../components/StyledSnackbar';
+import { ErrorState } from '../../../components/ErrorState';
 import { useUser, useUpdateUser } from '../../../hooks/queries/useUsers';
 import { UserEditFormData } from '../../../schemas/user.schema';
 
@@ -18,7 +19,7 @@ export default function EditUserScreen() {
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   
   // Obtener datos del usuario
-  const { data: user, isLoading, error } = useUser(id);
+  const { data: user, isLoading, error, refetch } = useUser(id);
   const updateUser = useUpdateUser();
 
   const handleSubmit = async (data: Partial<UserEditFormData>) => {
@@ -52,16 +53,7 @@ export default function EditUserScreen() {
   }
 
   if (error || !user) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar el usuario
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'El usuario no existe'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar el usuario" onRetry={refetch} />;
   }
 
   return (

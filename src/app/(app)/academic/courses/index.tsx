@@ -15,6 +15,7 @@ import { getCoursesColumns } from './columns.config.courses';
 import { addOpacity } from '../../../../utils/colorUtils';
 import { getEducationStageColor, getEducationStageLabel } from '../../../../utils/educationStageUtils';
 import { styles } from './courses.styles';
+import { ErrorState } from '../../../../components/ErrorState';
 
 // Pantalla de gestión de cursos
 export default function CoursesScreen() {
@@ -114,16 +115,7 @@ export default function CoursesScreen() {
   }
 
   if (error) {
-    return (     
-      <View style={[styles.container, styles.centered]}>
-        <Text variant="titleMedium" style={{ color: theme.colors.error }}>
-          Error al cargar cursos
-        </Text>
-        <Text variant="bodyMedium" style={{ marginTop: 8, color: theme.colors.onSurface }}>
-          {error instanceof Error ? error.message : 'Error desconocido'}
-        </Text>
-      </View>
-    );
+    return <ErrorState message="Error al cargar cursos" onRetry={refetch} />;
   }
 
   return (
