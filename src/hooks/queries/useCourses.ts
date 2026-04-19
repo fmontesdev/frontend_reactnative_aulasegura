@@ -54,9 +54,11 @@ export function useUpdateCourse() {
   return useMutation({
     mutationFn: ({ courseId, data }: { courseId: number; data: UpdateCourseData }) =>
       courseService.updateCourse(courseId, data),
-    onSuccess: (_, variables) => {
+    onSuccess: (updatedCourse) => {
+      // Actualiza el detalle inmediatamente desde la respuesta (sin re-fetch)
+      queryClient.setQueryData(courseKeys.detail(updatedCourse.courseId), updatedCourse);
+      // Invalida la lista para que refleje el cambio
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(variables.courseId) });
     },
   });
 }
@@ -67,7 +69,10 @@ export function useSoftDeleteCourse() {
 
   return useMutation({
     mutationFn: (courseId: number) => courseService.deleteCourse(courseId),
-    onSuccess: () => {
+    onSuccess: (_, deletedCourseId) => {
+      // Elimina el detalle del caché
+      queryClient.removeQueries({ queryKey: courseKeys.detail(deletedCourseId) });
+      // Invalida la lista
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
     },
   });

@@ -66,9 +66,11 @@ export function useUpdateDepartment() {
   return useMutation({
     mutationFn: ({ departmentId, data }: { departmentId: number; data: UpdateDepartmentDto }) =>
       departmentService.updateDepartment(departmentId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
-      queryClient.invalidateQueries({ queryKey: departmentKeys.detail(variables.departmentId) });
+    onSuccess: (updatedDepartment) => {
+      // Actualiza el detalle inmediatamente desde la respuesta (sin re-fetch)
+      queryClient.setQueryData(departmentKeys.detail(updatedDepartment.departmentId), updatedDepartment);
+      // Invalida la lista para que refleje el cambio
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 }
@@ -79,8 +81,11 @@ export function useDeleteDepartment() {
 
   return useMutation({
     mutationFn: (departmentId: number) => departmentService.deleteDepartment(departmentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.all });
+    onSuccess: (_, deletedId) => {
+      // Elimina el detalle del caché
+      queryClient.removeQueries({ queryKey: departmentKeys.detail(deletedId) });
+      // Invalida la lista
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 }
