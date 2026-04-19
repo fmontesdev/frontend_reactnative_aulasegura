@@ -11,6 +11,7 @@ import { useAppTheme } from '../../theme';
 import { UserEditSchema, UserEditFormData, UserCreateFormData } from '../../schemas/user.schema';
 import { User, RoleName } from '../../types/User';
 import { isApiError } from '../../errors/ApiError';
+import { getChangedFields } from '../../utils/formUtils';
 import { styles } from './UserForm.styles';
 
 interface EditUserFormProps {
@@ -18,33 +19,6 @@ interface EditUserFormProps {
   isLoading?: boolean;
   initialData: User;
 }
-
-const getChangedFields = (
-  data: UserEditFormData,
-  initialData: User
-): Partial<UserEditFormData> => {
-  const changedFields: Partial<UserEditFormData> = {};
-
-  if (data.name !== initialData.name) changedFields.name = data.name;
-  if (data.lastname !== initialData.lastname) changedFields.lastname = data.lastname;
-  if (data.email !== initialData.email) changedFields.email = data.email;
-  if (data.password && data.password !== '') changedFields.password = data.password;
-  if (data.avatar !== initialData.avatar) changedFields.avatar = data.avatar;
-
-  const rolesChanged =
-    JSON.stringify([...data.roles].sort()) !== JSON.stringify([...initialData.roles].sort());
-  if (rolesChanged) changedFields.roles = data.roles;
-
-  if (data.departmentId !== initialData.department?.departmentId) {
-    changedFields.departmentId = data.departmentId;
-  }
-
-  if (data.validTo !== initialData.validTo) {
-    changedFields.validTo = data.validTo;
-  }
-
-  return changedFields;
-};
 
 export function EditUserForm({ onSubmit, isLoading = false, initialData }: EditUserFormProps) {
   const theme = useAppTheme();
@@ -89,7 +63,23 @@ export function EditUserForm({ onSubmit, isLoading = false, initialData }: EditU
         data.avatar = uploadedAvatar;
       }
 
-      const changedFields = getChangedFields(data, initialData);
+      const { password, ...rest } = data;
+      const normalizedInitial: Record<string, unknown> = {
+        name: initialData.name,
+        lastname: initialData.lastname,
+        email: initialData.email,
+        avatar: initialData.avatar,
+        roles: initialData.roles,
+        departmentId: initialData.department?.departmentId,
+        validTo: initialData.validTo ?? null,
+      };
+      const changedFields = getChangedFields(
+        rest as unknown as Record<string, unknown>,
+        normalizedInitial,
+      ) as Partial<UserEditFormData>;
+      if (password && password !== '') {
+        changedFields.password = password;
+      }
       await onSubmit(changedFields);
     } catch (e: unknown) {
       const msg = isApiError(e) ? e.message : 'Error inesperado al guardar';

@@ -16,6 +16,9 @@ export const APP_CONFIG = {
   VERSION: '1.0.0',
 };
 
+// Año académico activo (actualizar al inicio de cada curso escolar)
+export const CURRENT_ACADEMIC_YEAR = '2025-2026';
+
 // Exportar todo por defecto para facilitar imports
 export default {
   ...API_CONFIG,

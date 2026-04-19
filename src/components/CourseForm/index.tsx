@@ -12,6 +12,8 @@ import { FormSegmentedButtons } from '../FormSegmentedButtons';
 import { useAppTheme } from '../../theme';
 import { CourseFormSchema, CourseFormData } from '../../schemas/course.schema';
 import { Course, EducationStage, CFLevel } from '../../types/Course';
+import { CURRENT_ACADEMIC_YEAR } from '../../constants';
+import { getChangedFields } from '../../utils/formUtils';
 import { styles } from './CourseForm.styles';
 
 interface CourseFormProps {
@@ -58,7 +60,7 @@ export function CourseForm({ mode, initialData, onSubmit, isLoading = false }: C
           educationStage: initialData.educationStage,
           levelNumber: initialData.levelNumber,
           cfLevel: initialData.cfLevel,
-          academicYearCode: initialData.academicYears[0]?.code || '2025-2026',
+          academicYearCode: initialData.academicYears[0]?.code || CURRENT_ACADEMIC_YEAR,
         }
       : {
           courseCode: '',
@@ -66,7 +68,7 @@ export function CourseForm({ mode, initialData, onSubmit, isLoading = false }: C
           educationStage: EducationStage.ESO,
           levelNumber: 1,
           cfLevel: null,
-          academicYearCode: '2025-2026',
+          academicYearCode: CURRENT_ACADEMIC_YEAR,
         }
   });
 
@@ -94,28 +96,21 @@ export function CourseForm({ mode, initialData, onSubmit, isLoading = false }: C
     }
   }, [watchedEducationStage, setValue, watch]);
 
-  // Obtener solo los campos modificados en modo edición
-  const getChangedFields = (data: CourseFormData): Partial<CourseFormData> => {
-    if (!initialData) return data;
-
-    const changedFields: Partial<CourseFormData> = {};
-
-    if (data.courseCode !== initialData.courseCode) changedFields.courseCode = data.courseCode;
-    if (data.name !== initialData.name) changedFields.name = data.name;
-    if (data.educationStage !== initialData.educationStage) changedFields.educationStage = data.educationStage;
-    if (data.levelNumber !== initialData.levelNumber) changedFields.levelNumber = data.levelNumber;
-    if (data.cfLevel !== initialData.cfLevel) changedFields.cfLevel = data.cfLevel;
-    if (data.academicYearCode !== initialData.academicYears[0]?.code) {
-      changedFields.academicYearCode = data.academicYearCode;
-    }
-
-    return changedFields;
-  };
-
   // Función principal de submit
   const handleFormSubmit = async (data: CourseFormData) => {
     if (mode === 'edit' && initialData) {
-      const changedFields = getChangedFields(data);
+      const normalizedInitial: Record<string, unknown> = {
+        courseCode: initialData.courseCode,
+        name: initialData.name,
+        educationStage: initialData.educationStage,
+        levelNumber: initialData.levelNumber,
+        cfLevel: initialData.cfLevel,
+        academicYearCode: initialData.academicYears[0]?.code,
+      };
+      const changedFields = getChangedFields(
+        data as unknown as Record<string, unknown>,
+        normalizedInitial,
+      );
       await onSubmit(changedFields as any);
     } else {
       await onSubmit(data as any);
