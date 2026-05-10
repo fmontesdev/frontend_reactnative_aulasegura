@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import { Text, Button, IconButton } from 'react-native-paper';
+import { Text, Button, IconButton, ActivityIndicator } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../theme';
 import { KPICard } from '../../components/KPICard';
@@ -10,29 +10,61 @@ import { WidgetCard } from '../../components/WidgetCard';
 import { ReservationItem } from '../../components/ReservationItem';
 import { DeniedAccessItem } from '../../components/DeniedAccessItem';
 import { useActiveUsersCount } from '../../hooks/queries/useUsers';
+import { useAccessLogs } from '../../hooks/queries/useAccessLogs';
 import { 
   kpiData as mockKpiData, 
   recentReservations as mockRecentReservations, 
-  deniedAccess as mockDeniedAccess, 
   quickActions as mockQuickActions 
 } from '../../data/dummies';
+
+function formatDenialRate(totalAccesses?: number, deniedAccesses?: number) {
+  if (totalAccesses === undefined || deniedAccesses === undefined) {
+    return '...';
+  }
+
+  if (totalAccesses === 0) {
+    return '0%';
+  }
+
+  return `${((deniedAccesses / totalAccesses) * 100).toFixed(1)}%`;
+}
 
 export default function HomeScreen() {
   const theme = useAppTheme();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { data: activeUsersCount } = useActiveUsersCount();
+  const { data: todayAccessResponse } = useAccessLogs({
+    page: 1,
+    limit: 1,
+    filters: ['fecha:hoy'],
+  });
+  const {
+    data: deniedAccessResponse,
+    isLoading: isDeniedAccessLoading,
+    error: deniedAccessError,
+  } = useAccessLogs({
+    page: 1,
+    limit: 3,
+    filters: ['fecha:hoy', 'estado:denegado'],
+  });
 
   // Datos dummy para KPIs, reservas, accesos denegados y acciones rápidas
   const kpiData = mockKpiData(theme);
+  const todayAccessTotal = todayAccessResponse?.meta.total;
+  const deniedAccessTotal = deniedAccessResponse?.meta.total;
   // Reemplaza el valor dummy de usuarios activos con el dato real
   const kpiDataWithRealValues = kpiData.map((kpi) =>
     kpi.title === 'Usuarios activos'
       ? { ...kpi, value: activeUsersCount ?? '...' }
+      : kpi.title === 'Accesos hoy'
+      ? { ...kpi, value: todayAccessTotal ?? '...' }
+      : kpi.title === 'Tasa de denegación'
+      ? { ...kpi, value: formatDenialRate(todayAccessTotal, deniedAccessTotal) }
       : kpi
   );
   const recentReservations = mockRecentReservations;
-  const deniedAccess = mockDeniedAccess;
+  const deniedAccess = deniedAccessResponse?.data || [];
   const quickActions = mockQuickActions(theme);
 
   const isSmallScreen = width < 768;
@@ -108,18 +140,30 @@ export default function HomeScreen() {
           <WidgetCard
             title="Últimos accesos denegados"
             actionLabel="Ver logs"
-            onActionPress={() => router.push('/supervision/logs')}
+            onActionPress={() => router.push('/supervision/logs?filters=fecha:hoy,estado:denegado')}
             style={styles.widgetCard}
           >
-            {deniedAccess.map((access) => (
-              <DeniedAccessItem
-                key={access.id}
-                user={access.user}
-                classroom={access.classroom}
-                time={access.time}
-                reason={access.reason}
-              />
-            ))}
+            {isDeniedAccessLoading ? (
+              <View style={styles.widgetState}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              </View>
+            ) : deniedAccessError ? (
+              <Text variant="bodySmall" style={[styles.widgetStateText, { color: theme.colors.error }]}> 
+                No se pudieron cargar los accesos denegados.
+              </Text>
+            ) : deniedAccess.length > 0 ? (
+              deniedAccess.map((access, index) => (
+                <DeniedAccessItem
+                  key={access.accessLogId}
+                  accessLog={access}
+                  isLast={index === deniedAccess.length - 1}
+                />
+              ))
+            ) : (
+              <Text variant="bodySmall" style={[styles.widgetStateText, { color: theme.colors.grey }]}> 
+                No hay accesos denegados hoy.
+              </Text>
+            )}
           </WidgetCard>
         </View>
 
@@ -179,6 +223,15 @@ const styles = StyleSheet.create({
   widgetCard: {
     flex: 1,
     minWidth: 300,
+  },
+  widgetState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 24,
+  },
+  widgetStateText: {
+    paddingVertical: 16,
+    textAlign: 'center',
   },
   actionsGrid: {
     flexDirection: 'row',

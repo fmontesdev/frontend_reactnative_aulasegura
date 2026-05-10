@@ -12,14 +12,6 @@ export interface Reservation {
   status: 'approved' | 'pending' | 'rejected';
 }
 
-export interface DeniedAccess {
-  id: number;
-  user: string;
-  classroom: string;
-  reason: string;
-  time: string;
-}
-
 export interface KPIData {
   title: string;
   value: number | string;

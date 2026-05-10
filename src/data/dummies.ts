@@ -16,13 +16,6 @@ export const kpiData = (theme: AppTheme) => [
     route: '/access/reservations',
   },
   {
-    title: 'Incidencias abiertas',
-    value: 7,
-    icon: 'alert-circle' as const,
-    color: theme.colors.error,
-    route: '/supervision/incidents',
-  },
-  {
     title: 'Usuarios activos',
     value: 142,
     icon: 'account-group' as const,
@@ -31,10 +24,17 @@ export const kpiData = (theme: AppTheme) => [
   },
   {
     title: 'Accesos hoy',
-    value: '356 / 12',
+    value: '...',
     icon: 'door-open' as const,
     color: theme.colors.tertiary,
-    route: '/supervision/logs',
+    route: '/supervision/logs?filters=fecha:hoy',
+  },
+  {
+    title: 'Tasa de denegación',
+    value: '...',
+    icon: 'shield-alert' as const,
+    color: theme.colors.error,
+    route: '/supervision/logs?filters=fecha:hoy,estado:denegado',
   },
 ];
 
@@ -42,11 +42,6 @@ export const recentReservations = [
   { id: 1, classroom: 'Aula 47', user: 'Paco García', time: '15:10 - 16:05', status: 'approved' as const },
   { id: 2, classroom: 'Aula 12', user: 'María López', time: '16:05 - 17:00', status: 'pending' as const },
   { id: 3, classroom: 'Laboratorio 3', user: 'Juan Pérez', time: '17:00 - 18:00', status: 'approved' as const },
-];
-
-export const deniedAccess = [
-  { id: 1, user: 'Carlos Ruiz', classroom: 'Aula 8', reason: 'Sin permisos', time: '10:30' },
-  { id: 2, user: 'Ana Martín', classroom: 'Aula 15', reason: 'Fuera de horario', time: '14:15' },
 ];
 
 export const quickActions = (theme: AppTheme) => [
