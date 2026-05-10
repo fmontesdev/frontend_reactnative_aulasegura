@@ -3,7 +3,6 @@ import { View, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../theme';
 import { useAuth } from '../hooks/useAuth';
-import { notifications as mockNotifications } from '../data/dummies';
 import { GlobalSearch } from './Search/GlobalSearch';
 import { SearchMenu } from './Search/SearchMenu';
 import { AcademicYearSelector } from './AcademicYearMenu';
@@ -58,7 +57,7 @@ export default function Topbar({ sidebarCollapsed }: TopbarProps) {
         {(isLargeScreen || isMediumScreen) && (
           <AcademicYearSelector selectedYear={selectedYear} onYearSelect={handleYearSelect} />
         )}
-        <NotificationMenu notifications={mockNotifications} />
+        <NotificationMenu />
         <UserProfileMenu user={user} onLogout={handleLogout} />
       </View>
     </View>

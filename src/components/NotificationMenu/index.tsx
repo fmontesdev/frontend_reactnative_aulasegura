@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
-import { Text, Menu, Badge } from 'react-native-paper';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text, Menu, Badge, ActivityIndicator } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../theme';
 import { addOpacity } from '../../utils/colorUtils';
 import { NotificationItem } from './components/NotificationItem';
-import { Notification } from '../../types/Notification';
-
-interface NotificationMenuProps {
-  notifications: Notification[];
-}
+import { useMarkAllNotificationsAsRead, useMarkNotificationAsRead, useNotifications, useUnreadNotificationCount } from '../../hooks/queries/useNotifications';
 
 // Menú de notificaciones del Topbar
-export function NotificationMenu({ notifications }: NotificationMenuProps) {
+export function NotificationMenu() {
   const theme = useAppTheme();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [isHoveredIcon, setIsHoveredIcon] = useState(false);
   const [isHoveredButton, setIsHoveredButton] = useState(false);
+  const [isHoveredMarkRead, setIsHoveredMarkRead] = useState(false);
+  const { data: notificationsPage, isLoading } = useNotifications({ page: 1, limit: 5, read: false });
+  const { data: unreadCountData } = useUnreadNotificationCount();
+  const markAsRead = useMarkNotificationAsRead();
+  const markAllAsRead = useMarkAllNotificationsAsRead();
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const visibleNotifications = notificationsPage?.data ?? [];
+  const unreadCount = unreadCountData?.count ?? visibleNotifications.filter((notification) => notification.readAt === null).length;
 
   return (
     <View style={styles.container}>
@@ -53,37 +55,79 @@ export function NotificationMenu({ notifications }: NotificationMenuProps) {
         contentStyle={[styles.menu, { backgroundColor: theme.colors.surface }]}
       >
         <View style={styles.notificationsContainer}>
-          <View style={[styles.titleContainer, { borderBottomColor: theme.colors.outlineVariant }]}>
-            <Text variant="titleMedium" style={[styles.title, { color: theme.colors.secondary }]}>
-              Notificaciones
+          <View style={[styles.titleContainer, { borderBottomColor: theme.colors.outlineVariant }]}> 
+            <Text variant="titleMedium" style={[styles.title, { color: theme.colors.secondary }]}> 
+              No leídas
             </Text>
+            {unreadCount > 0 ? (
+              <Pressable
+                onPress={() => markAllAsRead.mutate()}
+                disabled={markAllAsRead.isPending}
+                onHoverIn={() => setIsHoveredMarkRead(true)}
+                onHoverOut={() => setIsHoveredMarkRead(false)}
+                style={[
+                  styles.markReadAction,
+                  {
+                    backgroundColor: isHoveredMarkRead ? addOpacity(theme.colors.success, 0.08) : 'transparent',
+                    // @ts-ignore
+                    transitionDuration: '200ms',
+                  },
+                ]}
+              >
+                <MaterialCommunityIcons name="check-all" size={15} color={theme.colors.success} />
+                <Text variant="labelSmall" style={{ color: theme.colors.success }}>
+                  Marcar leídas
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
-          {notifications.map(notification => (
-            <NotificationItem
-              key={notification.id}
-              notification={notification}
+          {isLoading ? (
+            <View style={styles.stateContainer}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            </View>
+          ) : visibleNotifications.length > 0 ? (
+            visibleNotifications.map(notification => (
+              <NotificationItem
+                key={notification.notificationId}
+                notification={notification}
+                showUnreadIcon={false}
+                onPress={() => {
+                  if (notification.readAt === null) {
+                    markAsRead.mutate(notification.notificationId);
+                  }
+                }}
+              />
+            ))
+          ) : (
+            <View style={styles.stateContainer}>
+              <Text variant="bodyMedium" style={{ color: theme.colors.grey }}>
+                No hay notificaciones
+              </Text>
+            </View>
+          )}
+          <View style={[styles.footer, { borderTopColor: theme.colors.outlineVariant }]}> 
+            <Pressable
               onPress={() => {
-                // TODO: Marcar como leída y navegar
+                setVisible(false);
+                router.push('/notifications');
               }}
-            />
-          ))}
-          <Pressable
-            onPress={() => {
-              setVisible(false);
-              router.push('/notifications');
-            }}
-            onHoverIn={() => setIsHoveredButton(true)}
-            onHoverOut={() => setIsHoveredButton(false)}
-            style={[styles.viewAllButton, {
-              backgroundColor: isHoveredButton ? addOpacity(theme.colors.tertiary, 0.08) : 'transparent',
-              // @ts-ignore
-              transitionDuration: '200ms',
-            }]}
-          >
-            <Text variant="labelLarge" style={{ color: theme.colors.tertiary }}>
-              Ver todas
-            </Text>
-          </Pressable>
+              onHoverIn={() => setIsHoveredButton(true)}
+              onHoverOut={() => setIsHoveredButton(false)}
+              style={[styles.viewAllButton, {
+                backgroundColor: isHoveredButton ? addOpacity(theme.colors.secondary, 0.08) : 'transparent',
+                // @ts-ignore
+                transitionDuration: '200ms',
+              }]}
+            >
+              <View style={styles.viewAllTextContainer}>
+                <MaterialCommunityIcons name="bell-outline" size={16} color={theme.colors.secondary} />
+                <Text variant="labelLarge" style={{ color: theme.colors.secondary }}>
+                  Ver todas las notificaciones
+                </Text>
+              </View>
+              <MaterialCommunityIcons name="arrow-right" size={18} color={theme.colors.secondary} />
+            </Pressable>
+          </View>
         </View>
       </Menu>
     </View>
@@ -105,26 +149,51 @@ const styles = StyleSheet.create({
   },
   menu: {
     marginTop: 64,
-    minWidth: 320,
-    maxWidth: 400,
+    marginVertical: 0,
+    paddingVertical: 0,
+    minWidth: 360,
+    maxWidth: 420,
     borderRadius: 20,
     overflow: 'hidden',
   },
-  notificationsContainer: {
-    maxHeight: 400,
-  },
+  notificationsContainer: {},
   titleContainer: {
     borderBottomWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 12,
   },
   title: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  viewAllTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  footer: {
+    borderTopWidth: 1,
+  },
+  markReadAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 20,
-    alignSelf: 'center',
-    marginTop: 6,
+    borderRadius: 12,
+  },
+  stateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
   },
 });

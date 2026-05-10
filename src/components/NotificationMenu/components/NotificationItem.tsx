@@ -9,61 +9,73 @@ import { addOpacity } from '../../../utils/colorUtils';
 interface NotificationItemProps {
   notification: Notification;
   onPress: () => void;
+  showUnreadIcon?: boolean;
 }
 
 // Item de notificación
-export function NotificationItem({ notification, onPress }: NotificationItemProps) {
+export function NotificationItem({ notification, onPress, showUnreadIcon = true }: NotificationItemProps) {
   const theme = useAppTheme();
   const [isHovered, setIsHovered] = useState(false);
 
-  const getIconName = (type: string) => {
-    switch (type) {
-      case 'warning':
-        return 'alert';
-      case 'error':
-        return 'alert-circle';
-      default:
-        return 'check-circle';
-    }
-  };
-
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'warning':
-        return theme.colors.warning;
-      case 'error':
-        return theme.colors.error;
-      default:
-        return theme.colors.success;
-    }
-  };
+  const isUnread = notification.readAt === null;
+  const createdAt = new Date(notification.createdAt);
+  const formattedTime = Number.isNaN(createdAt.getTime())
+    ? ''
+    : createdAt.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const iconName = notification.type === 'access'
+    ? 'shield-alert'
+    : notification.type === 'warning'
+      ? 'alert'
+      : 'information';
+  const typeIconColor = notification.type === 'access'
+    ? theme.colors.error
+    : notification.type === 'warning'
+      ? theme.colors.warning
+      : theme.colors.tertiary;
+  const hoverBackgroundColor = addOpacity(theme.colors.secondary, 0.1);
+  const iconColor = isUnread ? typeIconColor : addOpacity(theme.colors.onSurface, 0.35);
+  const iconBackgroundColor = addOpacity(isUnread ? typeIconColor : theme.colors.grey, 0.12);
+  const primaryTextColor = isUnread ? theme.colors.onSurface : theme.colors.grey;
+  const secondaryTextColor = isUnread ? theme.colors.onSurface : theme.colors.grey;
 
   return (
     <Pressable
       style={[
         styles.container,
-        !notification.read && { backgroundColor: addOpacity(theme.colors.secondary, 0.05) },
-        isHovered && { backgroundColor: addOpacity(theme.colors.secondary, 0.1) },
+        isHovered && { backgroundColor: hoverBackgroundColor },
       ]}
       onPress={onPress}
       onHoverIn={() => setIsHovered(true)}
       onHoverOut={() => setIsHovered(false)}
     >
       <View style={styles.content}>
-        <MaterialCommunityIcons
-          name={getIconName(notification.type)}
-          size={20}
-          color={getIconColor(notification.type)}
-          style={styles.icon}
-        />
+        <View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}> 
+          <MaterialCommunityIcons name={iconName} size={24} color={iconColor} />
+        </View>
         <View style={styles.textContainer}>
-          <Text variant="bodyMedium" numberOfLines={2}>
-            {notification.title}
-          </Text>
-          <Text variant="bodySmall" style={{ color: theme.colors.grey }}>
-            {notification.time}
+          <View style={styles.titleRow}>
+            <Text variant="bodyMedium" numberOfLines={1} style={[styles.title, { color: primaryTextColor }]}> 
+              {notification.title}
+            </Text>
+            <View style={styles.dateContainer}>
+              <MaterialCommunityIcons name="clock-outline" size={13} color={theme.colors.grey} />
+              <Text variant="bodySmall" numberOfLines={1} style={[styles.date, { color: theme.colors.grey }]}> 
+                {formattedTime}
+              </Text>
+            </View>
+          </View>
+          <Text variant="bodySmall" numberOfLines={2} style={{ color: secondaryTextColor }}>
+            {notification.body}
           </Text>
         </View>
+        {isUnread && showUnreadIcon ? (
+          <MaterialCommunityIcons
+            name="email-mark-as-unread"
+            size={22}
+            color={theme.colors.tertiary}
+            style={styles.unreadIcon}
+          />
+        ) : null}
       </View>
     </Pressable>
   );
@@ -71,19 +83,49 @@ export function NotificationItem({ notification, onPress }: NotificationItemProp
 
 const styles = StyleSheet.create({
   container: {
-    padding: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.05)',
   },
   content: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
-  icon: {
+  iconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
-    marginTop: 2,
   },
   textContainer: {
     flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
+    gap: 12,
+  },
+  title: {
+    flexShrink: 1,
+    fontWeight: '700',
+  },
+  date: {
+    flexShrink: 0,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    flexShrink: 0,
+  },
+  unreadIcon: {
+    marginLeft: 8,
   },
 });

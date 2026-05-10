@@ -12,6 +12,8 @@ interface FormTextInputProps<T extends FieldValues> {
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   secureTextEntry?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  multiline?: boolean;
+  numberOfLines?: number;
 }
 
 export function FormTextInput<T extends FieldValues>({
@@ -22,6 +24,8 @@ export function FormTextInput<T extends FieldValues>({
   keyboardType = 'default',
   secureTextEntry = false,
   autoCapitalize = 'sentences',
+  multiline = false,
+  numberOfLines,
 }: FormTextInputProps<T>) {
   const theme = useAppTheme();
   const error = errors[name];
@@ -43,6 +47,8 @@ export function FormTextInput<T extends FieldValues>({
             keyboardType={keyboardType}
             secureTextEntry={secureTextEntry}
             autoCapitalize={autoCapitalize}
+            multiline={multiline}
+            numberOfLines={numberOfLines}
             style={[styles.input, { backgroundColor: theme.colors.onTertiary }]}
             outlineColor={theme.colors.outline}
             activeOutlineColor={theme.colors.tertiary}

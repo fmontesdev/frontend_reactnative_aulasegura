@@ -4,7 +4,6 @@
  */
 
 import { AppTheme } from '../theme';
-import { Notification } from '../types/Notification';
 
 export const kpiData = (theme: AppTheme) => [
   {
@@ -49,12 +48,6 @@ export const quickActions = (theme: AppTheme) => [
   { title: 'Crear Credencial', icon: 'card-plus' as const, route: '/credentials/create', color: theme.colors.warning },
   { title: 'Crear Reserva', icon: 'calendar-plus' as const, route: '/access/reservations/create', color: theme.colors.tertiary },
   { title: 'Crear Permiso', icon: 'key-plus' as const, route: '/access/permissions/create', color: theme.colors.success },
-];
-
-export const notifications: Notification[] = [
-  { id: 1, title: 'Reserva pendiente de validación', time: 'Hace 5 min', type: 'warning', read: false },
-  { id: 2, title: 'Lector offline en Aula 12', time: 'Hace 15 min', type: 'error', read: false },
-  { id: 3, title: 'Nueva credencial asignada', time: 'Hace 1 hora', type: 'success', read: true },
 ];
 
 export const academicYears = [
