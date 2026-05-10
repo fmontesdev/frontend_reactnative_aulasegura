@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Text, IconButton, Menu, Button } from 'react-native-paper';
 import { useAppTheme } from '../../../theme';
-import { Pagination } from '../../../types/User';
+import { Pagination } from '../../../types/Pagination';
 import { addOpacity } from '../../../utils/colorUtils';
 import { styles } from './DataTableFooter.styles';
 
