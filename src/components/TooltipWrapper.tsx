@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, ViewStyle, Platform, StyleSheet } from 'react-native';
+import { View, ViewStyle, Platform, StyleSheet, StyleProp } from 'react-native';
 import { Text, Portal } from 'react-native-paper';
 import { useAppTheme } from '../theme';
 import { addOpacity } from '../utils/colorUtils';
@@ -7,7 +7,7 @@ import { addOpacity } from '../utils/colorUtils';
 interface TooltipWrapperProps {
   title: string;
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   multiline?: boolean;
   placement?: 'top' | 'bottom';
 }
@@ -27,7 +27,7 @@ export const TooltipWrapper: React.FC<TooltipWrapperProps> = ({
     return (
       <View
         ref={ref}
-        style={styles.container}
+        style={[styles.container, style]}
         // @ts-ignore
         onMouseEnter={() => {
           const rect = (ref.current as any).getBoundingClientRect();
