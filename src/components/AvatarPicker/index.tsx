@@ -16,7 +16,6 @@ interface AvatarPickerProps<T extends FieldValues> {
   name: Path<T>;
   mode: 'create' | 'edit';
   initialAvatar?: string;
-  userId?: string;
   disabled?: boolean;
   errors: FieldErrors<T>;
   onUploadError?: (message: string) => void;
@@ -33,7 +32,6 @@ function AvatarPickerComponent<T extends FieldValues>(
     name,
     mode,
     initialAvatar,
-    userId,
     disabled = false,
     errors,
     onUploadError,
@@ -142,9 +140,6 @@ function AvatarPickerComponent<T extends FieldValues>(
         name={name}
         render={({ field: { onChange, value } }) => {
           const isPreview = value === '__preview__';
-          const selectedImageSource = isPreview && previewUrl
-            ? { uri: previewUrl }
-            : { uri: `${API_CONFIG.IMAGE_SERVER_URL}/${value}` };
 
           return (
             <View>

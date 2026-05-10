@@ -4,7 +4,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
   Easing,
 } from 'react-native-reanimated';
 
@@ -24,8 +23,6 @@ export function FadeView({ children, triggerKey, duration = 220, style }: FadeVi
     translateY.value = 10;
     // Opacidad: de 0.35 => 1, el contenido ya es visible desde el inicio, solo "aclara"
     opacity.value = withTiming(1, { duration, easing: Easing.out(Easing.quad) });
-    // Desplazamiento: spring suave sin rebote para una llegada orgánica
-    // translateY.value = withSpring(0, { damping: 22, stiffness: 180, mass: 0.8 });
   }, [triggerKey]);
 
   const animStyle = useAnimatedStyle(() => ({

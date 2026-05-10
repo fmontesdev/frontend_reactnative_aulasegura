@@ -143,7 +143,6 @@ export function EditUserForm({ onSubmit, isLoading = false, initialData }: EditU
             name="avatar"
             mode="edit"
             initialAvatar={initialData.avatar}
-            userId={initialData.userId}
             disabled={isLoading}
             errors={errors}
             onUploadError={(message) => {
