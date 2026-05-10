@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Platform, useWindowDimensions } from 'react-native';
 import { Slot, usePathname } from 'expo-router';
 import { useAppTheme } from '../../theme';
+import { AccessLogEventsProvider } from '../../contexts/AccessLogEventsContext';
 import { FilterProvider } from '../../contexts/FilterContext';
 import Sidebar from '../../components/Sidebar';
 import Topbar from '../../components/Topbar';
@@ -23,38 +24,40 @@ export default function AppLayout() {
   }, [width]);
 
   return (
-    <FilterProvider>
-      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        {/* Sidebar */}
-        <Sidebar
-          isCollapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+    <AccessLogEventsProvider>
+      <FilterProvider>
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}> 
+          {/* Sidebar */}
+          <Sidebar
+            isCollapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
 
-        {/* Main Content Area */}
-        <View style={styles.mainContent}>
-          {/* Topbar */}
-          <Topbar sidebarCollapsed={sidebarCollapsed} />
+          {/* Main Content Area */}
+          <View style={styles.mainContent}>
+            {/* Topbar */}
+            <Topbar sidebarCollapsed={sidebarCollapsed} />
 
-          {/* Content - Aquí se renderizan las rutas hijas */}
-          <ScrollView
-            style={[
-              styles.contentArea,
-              {
-                marginLeft: Platform.OS === 'web' ? (sidebarCollapsed ? 64 : 250) : 0,
-                marginTop: Platform.OS === 'web' ? 64 : 0,
-              },
-            ]}
-            contentContainerStyle={styles.contentContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            <FadeView triggerKey={pathname} duration={150}>
-              <Slot />
-            </FadeView>
-          </ScrollView>
+            {/* Content - Aquí se renderizan las rutas hijas */}
+            <ScrollView
+              style={[
+                styles.contentArea,
+                {
+                  marginLeft: Platform.OS === 'web' ? (sidebarCollapsed ? 64 : 250) : 0,
+                  marginTop: Platform.OS === 'web' ? 64 : 0,
+                },
+              ]}
+              contentContainerStyle={styles.contentContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              <FadeView triggerKey={pathname} duration={150}>
+                <Slot />
+              </FadeView>
+            </ScrollView>
+          </View>
         </View>
-      </View>
-    </FilterProvider>
+      </FilterProvider>
+    </AccessLogEventsProvider>
   );
 }
 

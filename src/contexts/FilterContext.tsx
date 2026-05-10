@@ -18,6 +18,10 @@ const FilterContext = createContext<FilterContextType>({
 
 const isWeb = Platform.OS === 'web' && typeof window !== 'undefined';
 
+function parseFilters(raw?: string | null) {
+  return raw ? String(raw).split(',').filter(Boolean) : [];
+}
+
 export function FilterProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -34,20 +38,28 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     const navigated = prevPathname.current !== pathname;
     prevPathname.current = pathname;
 
-    if (navigated) {
-      skipURLWrite.current = true;
-      setFilters([]);
-    } else {
+    const syncFiltersFromURL = () => {
+      const routeFilters = Array.isArray(searchParams.filters)
+        ? searchParams.filters[0]
+        : searchParams.filters as string | undefined;
       const raw = isWeb
         ? new URLSearchParams(window.location.search).get('filters')
-        : searchParams.filters as string | undefined;
-      const initial = raw ? String(raw).split(',').filter(Boolean) : [];
-      if (initial.length > 0) {
-        skipURLWrite.current = true;
-        setFilters(initial);
-      }
+        : routeFilters;
+      const initial = parseFilters(raw);
+
+      skipURLWrite.current = true;
+      setFilters(initial);
+    };
+
+    if (isWeb && navigated) {
+      const timeoutId = setTimeout(syncFiltersFromURL, 0);
+      return () => clearTimeout(timeoutId);
     }
-  }, [pathname]);
+
+    if (navigated || searchParams.filters) {
+      syncFiltersFromURL();
+    }
+  }, [pathname, searchParams.filters]);
 
   // Estado -> URL
   // Mantiene los query params sincronizados cuando el usuario agrega o quita chips

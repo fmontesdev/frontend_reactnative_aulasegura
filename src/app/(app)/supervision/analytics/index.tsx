@@ -1,5 +1,5 @@
 import React from 'react';
-import PlaceholderScreen from '../../../components/PlaceholderScreen';
+import PlaceholderScreen from '../../../../components/PlaceholderScreen';
 
 export default function AnalyticsScreen() {
   return (

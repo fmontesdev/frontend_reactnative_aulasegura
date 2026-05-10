@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, ScrollView, Pressable } from 'react-native';
 import { Icon } from 'react-native-paper';
+import { usePathname } from 'expo-router';
 import { useAppTheme } from '../../theme';
 import { addOpacity } from '../../utils/colorUtils';
 import { useFilters } from '../../contexts/FilterContext';
 import { StyledChip } from '../StyledChip';
+import { TooltipWrapper } from '../TooltipWrapper';
+
+const ACCESS_LOGS_SEARCH_HELP = `Ejemplos válidos:\njuan\ndenegado\ntiempo agotado\nusuario:juan\ntipo:rfid\nestado:denegado\nfecha:hoy\nfecha:semana\naula:25`;
+const DEFAULT_SEARCH_HELP = `Introduce texto y pulsa Enter o , para crear un filtro.\nEjemplos:\njuan\nemail:@gmail.com\nestado:activo`;
 
 // Buscador global con sistema de filtros por chips
 export function GlobalSearch() {
   const theme = useAppTheme();
+  const pathname = usePathname();
   const { filters, addFilter, removeFilter, clearFilters } = useFilters();
   const [inputValue, setInputValue] = useState('');
   const [isClearHovered, setIsClearHovered] = useState(false);
+  const searchHelp = pathname === '/supervision/logs' ? ACCESS_LOGS_SEARCH_HELP : DEFAULT_SEARCH_HELP;
 
   // Maneja tecla Enter o coma para agregar filtro
   const handleKeyPress = (e: any) => {
@@ -42,6 +49,11 @@ export function GlobalSearch() {
       }
     ]}>
       <Icon source="magnify" size={22} color={theme.colors.grey} />
+      <TooltipWrapper title={searchHelp} multiline placement="bottom">
+        <View style={styles.helpIcon}>
+          <Icon source="help-circle-outline" size={18} color={theme.colors.grey} />
+        </View>
+      </TooltipWrapper>
       
       <ScrollView 
         horizontal 
@@ -112,7 +124,10 @@ const styles = StyleSheet.create({
   },
   chipsContainer: {
     flex: 1,
-    marginLeft: 8,
+    marginLeft: 6,
+  },
+  helpIcon: {
+    marginLeft: 6,
   },
   chipsContent: {
     flexDirection: 'row',

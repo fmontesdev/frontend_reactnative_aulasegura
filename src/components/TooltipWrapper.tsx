@@ -8,9 +8,17 @@ interface TooltipWrapperProps {
   title: string;
   children: React.ReactNode;
   style?: ViewStyle;
+  multiline?: boolean;
+  placement?: 'top' | 'bottom';
 }
 
-export const TooltipWrapper: React.FC<TooltipWrapperProps> = ({ title, children, style }) => {
+export const TooltipWrapper: React.FC<TooltipWrapperProps> = ({
+  title,
+  children,
+  style,
+  multiline = false,
+  placement = 'top',
+}) => {
   const theme = useAppTheme();
   const ref = useRef<View>(null); // Referencia al contenedor para posicionar el tooltip
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null); // Posición del tooltip
@@ -34,6 +42,8 @@ export const TooltipWrapper: React.FC<TooltipWrapperProps> = ({ title, children,
           <Portal>
             <Text style={[
               styles.tooltip,
+              multiline && styles.tooltipMultiline,
+              placement === 'bottom' && styles.tooltipBottom,
               { left: tooltipPos.x, top: tooltipPos.y },
               { backgroundColor: addOpacity(theme.colors.superlightGrey, 0.94) },
               { color: theme.colors.grey },
@@ -66,5 +76,14 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
     // @ts-ignore
     whiteSpace: 'nowrap',
+  },
+  tooltipMultiline: {
+    maxWidth: 320,
+    // @ts-ignore
+    whiteSpace: 'pre-line',
+    lineHeight: 18,
+  },
+  tooltipBottom: {
+    transform: 'translateX(-50%) translateY(36px)',
   },
 });

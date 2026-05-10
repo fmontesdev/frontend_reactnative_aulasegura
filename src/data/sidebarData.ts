@@ -63,7 +63,7 @@ export const sidebarMenuItemsData: MenuItem[] = [
     id: 'supervision',
     label: 'Supervisión',
     icon: 'monitor-dashboard',
-    route: '/supervision/logs',
+    route: '/supervision/events',
   },
   {
     id: 'settings',

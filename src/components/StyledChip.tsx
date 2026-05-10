@@ -21,6 +21,7 @@ interface StyledChipProps {
   text?: string;
   children?: string;
   color?: string;
+  icon?: string;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   onClose?: () => void;
@@ -32,6 +33,7 @@ export function StyledChip({
   text,
   children,
   color,
+  icon,
   style,
   textStyle,
   onClose,
@@ -47,6 +49,7 @@ export function StyledChip({
     <Chip
       mode="flat"
       compact
+      icon={icon ? () => <Icon source={icon} size={14} color={chipColor} /> : undefined}
       onClose={onClose}
       closeIcon={() => <CloseIcon defaultColor={theme.colors.darkGrey} hoverColor={theme.colors.secondary} />}
       onPress={onPress}
