@@ -4,8 +4,8 @@ import PlaceholderScreen from '../../../components/PlaceholderScreen';
 export default function RFIDScreen() {
   return (
     <PlaceholderScreen
-      title="Credenciales RFID"
-      description="Gestión de tarjetas RFID asociadas a usuarios"
+      title="Credenciales NFC físicas"
+      description="Gestión de tarjetas y llaves NFC asociadas a usuarios"
       icon="contactless-payment"
     />
   );

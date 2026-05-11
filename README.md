@@ -4,7 +4,7 @@ Dashboard web de administración para la aplicación AulaSegura, desarrollado co
 
 ## 📋 Descripción
 
-Panel de administración de AulaSegura. Permite gestionar el acceso a aulas y espacios mediante QR, NFC y RFID: usuarios, cursos, departamentos, asignaturas, reservas, permisos y supervisión en tiempo real.
+Panel de administración de AulaSegura. Permite gestionar el acceso a aulas y espacios mediante QR, NFC física y NFC móvil: usuarios, cursos, departamentos, asignaturas, reservas, permisos y supervisión en tiempo real.
 
 **Importante:** Esta aplicación está destinada exclusivamente para **web/escritorio** y uso del **rol administrador**.
 
@@ -60,7 +60,7 @@ src/
 │       ├── academic/            # Cursos, departamentos, asignaturas
 │       ├── spaces/              # Aulas, lectores, plano
 │       ├── access/              # Permisos, reservas, validaciones
-│       ├── credentials/         # RFID, NFC
+│       ├── credentials/         # NFC físicas, NFC móviles
 │       ├── supervision/         # Analíticas, incidencias, logs
 │       ├── notifications/       # Notificaciones
 │       └── settings/            # Configuración
@@ -198,7 +198,7 @@ La app queda disponible en `http://localhost:8081`.
 ### Secciones en desarrollo (placeholder)
 - 🔄 Espacios: Aulas, Lectores, Plano del centro
 - 🔄 Acceso: Permisos, Reservas, Validaciones
-- 🔄 Credenciales: RFID, NFC
+- 🔄 Credenciales: NFC físicas, NFC móviles
 - 🔄 Supervisión: Analíticas, Incidencias, Logs
 - 🔄 Notificaciones
 - 🔄 Configuración del sistema

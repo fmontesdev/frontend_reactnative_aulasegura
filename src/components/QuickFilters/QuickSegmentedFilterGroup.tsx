@@ -57,10 +57,11 @@ const styles = StyleSheet.create({
   },
   segmentButton: {
     minHeight: 30,
+    minWidth: 92,
   },
   segmentLabel: {
-    fontSize: 11,
-    lineHeight: 14,
+    fontSize: 12,
+    lineHeight: 15,
     marginVertical: 2,
     marginHorizontal: 1,
   },

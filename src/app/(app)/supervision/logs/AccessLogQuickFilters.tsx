@@ -5,7 +5,7 @@ import { QuickSegmentedFilterGroup } from '../../../../components/QuickFilters/Q
 
 const DATE_FILTERS = ['fecha:hoy', 'fecha:semana', 'fecha:mes'];
 const METHOD_FILTERS = ['tipo:rfid', 'tipo:nfc', 'tipo:qr'];
-const STATUS_FILTERS = ['estado:permitido', 'estado:denegado', 'estado:salida', 'estado:tiempo agotado'];
+const STATUS_FILTERS = ['estado:permitido', 'estado:denegado', 'estado:tiempo agotado'];
 
 function findSelectedFilter(filters: string[], group: string[]) {
   return filters.find((filter) => group.includes(filter));
@@ -37,6 +37,7 @@ export function AccessLogQuickFilters() {
       <QuickSegmentedFilterGroup
         selectedValue={selectedDate}
         onSelect={(value) => toggleGroupFilter(value, DATE_FILTERS)}
+        buttonStyle={styles.dateButton}
         options={[
           { label: 'Hoy', value: 'fecha:hoy' },
           { label: 'Semana', value: 'fecha:semana' },
@@ -48,8 +49,8 @@ export function AccessLogQuickFilters() {
         selectedValue={selectedMethod}
         onSelect={(value) => toggleGroupFilter(value, METHOD_FILTERS)}
         options={[
-          { label: 'RFID', value: 'tipo:rfid' },
-          { label: 'NFC', value: 'tipo:nfc' },
+          { label: 'NFC física', value: 'tipo:rfid' },
+          { label: 'NFC móvil', value: 'tipo:nfc' },
           { label: 'QR', value: 'tipo:qr' },
         ]}
       />
@@ -61,7 +62,6 @@ export function AccessLogQuickFilters() {
         options={[
           { label: 'Permitido', value: 'estado:permitido' },
           { label: 'Denegado', value: 'estado:denegado' },
-          { label: 'Salida', value: 'estado:salida' },
           { label: 'Timeout', value: 'estado:tiempo agotado' },
         ]}
       />
@@ -78,6 +78,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statusButton: {
-    minWidth: 86,
+    minWidth: 92,
+  },
+  dateButton: {
+    minWidth: 80,
   },
 });

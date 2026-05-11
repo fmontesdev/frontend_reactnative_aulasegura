@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { useRouter, usePathname, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
+import { normalizeFilterValue } from '../utils/filterDisplayUtils';
 
 interface FilterContextType {
   filters: string[];
@@ -85,7 +86,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
 
   // Función para agregar un filtro (chip)
   const addFilter = (filter: string) => {
-    const trimmed = filter.trim();
+    const trimmed = normalizeFilterValue(filter);
     if (trimmed && !filters.includes(trimmed)) setFilters(prev => [...prev, trimmed]);
   };
 

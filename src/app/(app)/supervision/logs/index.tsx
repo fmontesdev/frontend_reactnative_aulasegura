@@ -40,9 +40,9 @@ function formatAccessDate(createdAt: string) {
 
 function getAccessMethodConfig(method: AccessMethod, theme: ReturnType<typeof useAppTheme>) {
   const config: Record<AccessMethod, { color: string; label: string }> = {
-    rfid: { color: theme.colors.secondary, label: 'RFID' },
-    nfc: { color: theme.colors.warning, label: 'NFC' },
-    qr: { color: theme.colors.tertiary, label: 'QR' },
+    rfid: { color: theme.colors.tertiary, label: 'NFC física' },
+    nfc: { color: theme.colors.warning, label: 'NFC móvil' },
+    qr: { color: theme.colors.primary, label: 'QR' },
   };
 
   return config[method];

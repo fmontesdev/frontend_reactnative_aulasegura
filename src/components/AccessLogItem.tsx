@@ -45,9 +45,9 @@ export function AccessLogItem({ accessLog, isLast = false }: AccessLogItemProps)
   };
   const config = statusConfig[accessLog.accessStatus];
   const methodConfig: Record<string, { color: string; label: string }> = {
-    rfid: { color: theme.colors.secondary, label: 'RFID' },
-    nfc: { color: theme.colors.warning, label: 'NFC' },
-    qr: { color: theme.colors.tertiary, label: 'QR' },
+    rfid: { color: theme.colors.tertiary, label: 'NFC física' },
+    nfc: { color: theme.colors.warning, label: 'NFC móvil' },
+    qr: { color: theme.colors.primary, label: 'QR' },
   };
   const method = methodConfig[accessLog.accessMethod] ?? { color: theme.colors.grey, label: accessLog.accessMethod.toUpperCase() };
   const userName = `${accessLog.user?.name ?? ''} ${accessLog.user?.lastname ?? ''}`.trim() || 'Usuario desconocido';

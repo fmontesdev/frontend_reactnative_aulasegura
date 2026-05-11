@@ -7,9 +7,10 @@ import { addOpacity } from '../../utils/colorUtils';
 import { useFilters } from '../../contexts/FilterContext';
 import { StyledChip } from '../StyledChip';
 import { TooltipWrapper } from '../TooltipWrapper';
+import { formatFilterLabel } from '../../utils/filterDisplayUtils';
 import { styles } from './SearchMenu.styles';
 
-const ACCESS_LOGS_SEARCH_HELP = `Ejemplos válidos:\njuan\ndenegado\ntiempo agotado\nusuario:juan\ntipo:rfid\nestado:denegado\nfecha:hoy\nfecha:semana\naula:25`;
+const ACCESS_LOGS_SEARCH_HELP = `Ejemplos válidos:\njuan\ndenegado\ntiempo agotado\nusuario:juan\ntipo:NFC física\ntipo:NFC móvil\nestado:denegado\nfecha:hoy\nfecha:semana\naula:25`;
 const ROOMS_SEARCH_HELP = `Ejemplos válidos:\nlab\nnombre:A101\nbuilding:1\nfloor:0\ncourse:ESO`;
 const READERS_SEARCH_HELP = `Ejemplos válidos:\nreader-01\ncode:reader-01\ncodigo:reader-01\nroom:A101\nactive:true\nactive:false`;
 const DEFAULT_SEARCH_HELP = `Introduce texto y pulsa Enter o , para crear un filtro.\nEjemplos:\njuan\nemail:@gmail.com\nestado:activo`;
@@ -112,7 +113,7 @@ export function SearchMenu() {
               {filters.map((filter, index) => (
                 <StyledChip
                   key={index}
-                  text={filter}
+                  text={formatFilterLabel(filter)}
                   // variant={filter.includes(':') ? 'info' : 'default'}
                   color={filter.includes(':') ? theme.colors.tertiary : theme.colors.grey}
                   onClose={() => handleRemoveFilter(index)}

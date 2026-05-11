@@ -39,9 +39,9 @@ export function DeniedAccessItem({ accessLog, isLast = false }: DeniedAccessItem
   const accessTime = formatAccessTime(accessLog.createdAt);
 
   const methodConfig = {
-    rfid: { color: theme.colors.secondary, label: 'RFID' },
-    nfc: { color: theme.colors.warning, label: 'NFC' },
-    qr: { color: theme.colors.tertiary, label: 'QR' },
+    rfid: { color: theme.colors.tertiary, label: 'NFC física' },
+    nfc: { color: theme.colors.warning, label: 'NFC móvil' },
+    qr: { color: theme.colors.primary, label: 'QR' },
   }[accessLog.accessMethod];
 
   return (
