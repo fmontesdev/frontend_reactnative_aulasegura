@@ -1,20 +1,37 @@
 import React, { useState } from 'react';
 import { View, Pressable, TextInput } from 'react-native';
 import { Menu, Badge, Icon } from 'react-native-paper';
+import { usePathname } from 'expo-router';
 import { useAppTheme } from '../../theme';
 import { addOpacity } from '../../utils/colorUtils';
 import { useFilters } from '../../contexts/FilterContext';
 import { StyledChip } from '../StyledChip';
+import { TooltipWrapper } from '../TooltipWrapper';
 import { styles } from './SearchMenu.styles';
+
+const ACCESS_LOGS_SEARCH_HELP = `Ejemplos válidos:\njuan\ndenegado\ntiempo agotado\nusuario:juan\ntipo:rfid\nestado:denegado\nfecha:hoy\nfecha:semana\naula:25`;
+const ROOMS_SEARCH_HELP = `Ejemplos válidos:\nlab\nnombre:A101\nbuilding:1\nfloor:0\ncourse:ESO`;
+const READERS_SEARCH_HELP = `Ejemplos válidos:\nreader-01\ncode:reader-01\ncodigo:reader-01\nroom:A101\nactive:true\nactive:false`;
+const DEFAULT_SEARCH_HELP = `Introduce texto y pulsa Enter o , para crear un filtro.\nEjemplos:\njuan\nemail:@gmail.com\nestado:activo`;
+
+function getSearchHelp(pathname: string) {
+  if (pathname === '/supervision/logs') return ACCESS_LOGS_SEARCH_HELP;
+  if (pathname === '/spaces/classrooms') return ROOMS_SEARCH_HELP;
+  if (pathname === '/spaces/readers') return READERS_SEARCH_HELP;
+
+  return DEFAULT_SEARCH_HELP;
+}
 
 // Menú de búsqueda global del Topbar (versión responsive para pantallas pequeñas)
 export function SearchMenu() {
   const theme = useAppTheme();
+  const pathname = usePathname();
   const { filters, addFilter, removeFilter, clearFilters } = useFilters();
   const [visible, setVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isClearHovered, setIsClearHovered] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const searchHelp = getSearchHelp(pathname);
 
   // Maneja tecla Enter o coma para agregar filtro
   const handleKeyPress = (e: any) => {
@@ -84,6 +101,11 @@ export function SearchMenu() {
             }
           ]}>
             <Icon source="magnify" size={20} color={theme.colors.grey} />
+            <TooltipWrapper title={searchHelp} multiline placement="bottom">
+              <View style={styles.helpIcon}>
+                <Icon source="help-circle-outline" size={18} color={theme.colors.grey} />
+              </View>
+            </TooltipWrapper>
             
             <View style={styles.chipsAndInputContainer}>
               {/* Chips de filtros dentro del input */}
@@ -138,4 +160,3 @@ export function SearchMenu() {
     </View>
   );
 }
-

@@ -37,10 +37,20 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     minHeight: 43,
   },
+  emptyItem: {
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    minHeight: 43,
+  },
+  emptyItemText: {
+    fontSize: 14,
+  },
   switchLabel: {
     flex: 1,
     marginLeft: 3,
     marginRight: 12,
+    fontSize: 14,
   },
   switch: {
     transform: [{ scale: 0.9 }],

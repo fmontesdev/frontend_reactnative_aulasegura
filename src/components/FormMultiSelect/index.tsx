@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, ScrollView, Pressable } from 'react-native';
-import { Menu, TextInput, HelperText } from 'react-native-paper';
+import { Menu, TextInput, HelperText, Text } from 'react-native-paper';
 import { Controller, Control, FieldErrors, FieldValues, Path } from 'react-hook-form';
 import { useAppTheme } from '../../theme';
 import { MultiSelectItem } from './components/MultiSelectItem';
@@ -103,7 +103,9 @@ export function FormMultiSelect<T extends FieldValues>({
             >
               <ScrollView style={styles.menuScroll}>
                 {isLoading ? (
-                  <Menu.Item title={loadingText} disabled />
+                  <View style={styles.emptyItem}>
+                    <Text variant="bodyMedium" style={styles.emptyItemText}>{loadingText}</Text>
+                  </View>
                 ) : options.length > 0 ? (
                   options.map((option) => (
                     <MultiSelectItem
@@ -118,7 +120,9 @@ export function FormMultiSelect<T extends FieldValues>({
                     />
                   ))
                 ) : (
-                  <Menu.Item title={emptyText} disabled />
+                  <View style={styles.emptyItem}>
+                    <Text variant="bodyMedium" style={styles.emptyItemText}>{emptyText}</Text>
+                  </View>
                 )}
               </ScrollView>
             </Menu>

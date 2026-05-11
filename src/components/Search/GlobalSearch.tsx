@@ -9,7 +9,17 @@ import { StyledChip } from '../StyledChip';
 import { TooltipWrapper } from '../TooltipWrapper';
 
 const ACCESS_LOGS_SEARCH_HELP = `Ejemplos válidos:\njuan\ndenegado\ntiempo agotado\nusuario:juan\ntipo:rfid\nestado:denegado\nfecha:hoy\nfecha:semana\naula:25`;
+const ROOMS_SEARCH_HELP = `Ejemplos válidos:\nlab\nnombre:A101\nbuilding:1\nfloor:0\ncourse:ESO`;
+const READERS_SEARCH_HELP = `Ejemplos válidos:\nreader-01\ncode:reader-01\ncodigo:reader-01\nroom:A101\nactive:true\nactive:false`;
 const DEFAULT_SEARCH_HELP = `Introduce texto y pulsa Enter o , para crear un filtro.\nEjemplos:\njuan\nemail:@gmail.com\nestado:activo`;
+
+function getSearchHelp(pathname: string) {
+  if (pathname === '/supervision/logs') return ACCESS_LOGS_SEARCH_HELP;
+  if (pathname === '/spaces/classrooms') return ROOMS_SEARCH_HELP;
+  if (pathname === '/spaces/readers') return READERS_SEARCH_HELP;
+
+  return DEFAULT_SEARCH_HELP;
+}
 
 // Buscador global con sistema de filtros por chips
 export function GlobalSearch() {
@@ -18,7 +28,7 @@ export function GlobalSearch() {
   const { filters, addFilter, removeFilter, clearFilters } = useFilters();
   const [inputValue, setInputValue] = useState('');
   const [isClearHovered, setIsClearHovered] = useState(false);
-  const searchHelp = pathname === '/supervision/logs' ? ACCESS_LOGS_SEARCH_HELP : DEFAULT_SEARCH_HELP;
+  const searchHelp = getSearchHelp(pathname);
 
   // Maneja tecla Enter o coma para agregar filtro
   const handleKeyPress = (e: any) => {

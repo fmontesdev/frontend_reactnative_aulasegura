@@ -38,6 +38,10 @@ export const styles = StyleSheet.create({
     gap: 5,
     marginLeft: 8,
   },
+  helpIcon: {
+    marginLeft: 8,
+    padding: 2,
+  },
   input: {
     flex: 1,
     minWidth: 120,
