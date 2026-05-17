@@ -3,86 +3,9 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Dialog, HelperText, Portal, Text } from 'react-native-paper';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormSingleSelect, SingleSelectOption } from '../FormSingleSelect';
 import { FormTextInput } from '../FormTextInput';
-import { MobileTagFormData, MobileTagFormSchema, PhysicalTagFormData, PhysicalTagFormSchema, RegenerateTagFormData, RegenerateTagFormSchema } from '../../schemas/tag.schema';
-import { TagType } from '../../types/Tag';
-
-interface CreateCredentialDialogProps {
-  visible: boolean;
-  type: TagType;
-  userOptions: SingleSelectOption[];
-  usersLoading: boolean;
-  isLoading: boolean;
-  onDismiss: () => void;
-  onSubmit: (data: PhysicalTagFormData | MobileTagFormData) => Promise<void>;
-}
-
-export function CreateCredentialDialog({
-  visible,
-  type,
-  userOptions,
-  usersLoading,
-  isLoading,
-  onDismiss,
-  onSubmit,
-}: CreateCredentialDialogProps) {
-  const isPhysical = type === 'rfid';
-  const schema = isPhysical ? PhysicalTagFormSchema : MobileTagFormSchema;
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<PhysicalTagFormData | MobileTagFormData>({
-    resolver: zodResolver(schema),
-    defaultValues: isPhysical ? { userId: '', rawUid: '' } : { userId: '' },
-  });
-
-  const handleClose = () => {
-    reset(isPhysical ? { userId: '', rawUid: '' } : { userId: '' });
-    onDismiss();
-  };
-
-  const handleValidSubmit = async (data: PhysicalTagFormData | MobileTagFormData) => {
-    await onSubmit(data);
-    reset(isPhysical ? { userId: '', rawUid: '' } : { userId: '' });
-  };
-
-  return (
-    <Portal>
-      <Dialog visible={visible} onDismiss={handleClose} style={styles.dialog}>
-        <Dialog.Title>{isPhysical ? 'Crear NFC física' : 'Crear NFC móvil'}</Dialog.Title>
-        <Dialog.Content>
-          <View style={styles.form}>
-            <FormSingleSelect
-              control={control}
-              name="userId"
-              label="Usuario"
-              errors={errors}
-              options={userOptions}
-              isLoading={usersLoading}
-              loadingText="Cargando usuarios..."
-              emptyText="No hay usuarios disponibles"
-            />
-            {isPhysical ? (
-              <FormTextInput
-                control={control}
-                name="rawUid"
-                label="UID físico"
-                errors={errors}
-                autoCapitalize="characters"
-              />
-            ) : (
-              <Text variant="bodySmall">La credencial móvil se generará automáticamente y solo se mostrará una vez.</Text>
-            )}
-          </View>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={handleClose} disabled={isLoading}>Cancelar</Button>
-          <Button mode="contained" onPress={handleSubmit(handleValidSubmit)} loading={isLoading} disabled={isLoading}>
-            Crear
-          </Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
-  );
-}
+import { RegenerateTagFormData, RegenerateTagFormSchema } from '../../schemas/tag.schema';
+import { useAppTheme } from '../../theme';
 
 interface RegenerateCredentialDialogProps {
   visible: boolean;
@@ -99,6 +22,7 @@ export function RegenerateCredentialDialog({
   onDismiss,
   onSubmit,
 }: RegenerateCredentialDialogProps) {
+  const theme = useAppTheme();
   const { control, handleSubmit, reset, formState: { errors } } = useForm<RegenerateTagFormData>({
     resolver: zodResolver(RegenerateTagFormSchema),
     defaultValues: { rawUid: '' },
@@ -116,8 +40,8 @@ export function RegenerateCredentialDialog({
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={handleClose} style={styles.dialog}>
-        <Dialog.Title>Regenerar NFC física</Dialog.Title>
+      <Dialog visible={visible} onDismiss={handleClose} style={[styles.dialog, { backgroundColor: theme.colors.surface }]}> 
+        <Dialog.Title style={{ color: theme.colors.secondary }}>Regenerar NFC física</Dialog.Title>
         <Dialog.Content>
           <View style={styles.form}>
             <Text variant="bodyMedium">Introduce el nuevo UID para {credentialLabel}.</Text>
@@ -132,8 +56,8 @@ export function RegenerateCredentialDialog({
           </View>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={handleClose} disabled={isLoading}>Cancelar</Button>
-          <Button mode="contained" onPress={handleSubmit(handleValidSubmit)} loading={isLoading} disabled={isLoading}>
+          <Button mode="outlined" textColor={theme.colors.tertiary} contentStyle={styles.dialogButton} labelStyle={styles.dialogButtonLabel} onPress={handleClose} disabled={isLoading}>Cancelar</Button>
+          <Button mode="contained" buttonColor={theme.colors.tertiary} contentStyle={styles.dialogButton} labelStyle={styles.dialogButtonLabel} onPress={handleSubmit(handleValidSubmit)} loading={isLoading} disabled={isLoading}>
             Regenerar
           </Button>
         </Dialog.Actions>
@@ -150,5 +74,11 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 14,
+  },
+  dialogButton: {
+    paddingHorizontal: 12,
+  },
+  dialogButtonLabel: {
+    marginVertical: 9,
   },
 });

@@ -70,7 +70,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
+      <Dialog visible={visible} onDismiss={onDismiss} style={[styles.dialog, { backgroundColor: theme.colors.surface }]}> 
         <Dialog.Title style={{ color: colors.title }}>{title}</Dialog.Title>
         <Dialog.Content>
           <Text variant="bodyLarge">
@@ -85,10 +85,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </Dialog.Content>
         <Dialog.Actions>
           <Button
+            mode="outlined"
             onPress={onDismiss}
-            buttonColor={theme.colors.tertiary}
-            textColor={theme.colors.onTertiary}
+            textColor={theme.colors.tertiary}
             contentStyle={styles.dialogButton}
+            labelStyle={styles.dialogButtonLabel}
           >
             {cancelText}
           </Button>
@@ -114,5 +115,8 @@ const styles = StyleSheet.create({
   },
   dialogButton: {
     paddingHorizontal: 10,
+  },
+  dialogButtonLabel: {
+    marginVertical: 9,
   },
 });

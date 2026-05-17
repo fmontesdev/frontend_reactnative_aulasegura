@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ActivityIndicator, Avatar, Button, IconButton, Text } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 import { useAppTheme } from '../../theme';
 import { useFilters } from '../../contexts/FilterContext';
 import { usePaginationParams } from '../../hooks/usePaginationParams';
-import { useCreateTag, useDeleteTag, useTags, useUpdateTag } from '../../hooks/queries/useTags';
-import { useUsers } from '../../hooks/queries/useUsers';
+import { useDeleteTag, useTags, useUpdateTag } from '../../hooks/queries/useTags';
 import { DataTable, ColumnConfig } from '../DataTable';
 import { ConfirmDialog } from '../ConfirmDialog';
 import { ErrorState } from '../ErrorState';
@@ -15,10 +15,9 @@ import { TooltipWrapper } from '../TooltipWrapper';
 import apiService from '../../services/apiService';
 import { addOpacity } from '../../utils/colorUtils';
 import { isApiError } from '../../errors/ApiError';
-import { MobileTagFormData, PhysicalTagFormData, RegenerateTagFormData } from '../../schemas/tag.schema';
-import { CreateTagResponse, Tag, TagType } from '../../types/Tag';
-import { User } from '../../types/User';
-import { CreateCredentialDialog, RegenerateCredentialDialog } from './CredentialDialogs';
+import { RegenerateTagFormData } from '../../schemas/tag.schema';
+import { Tag, TagType } from '../../types/Tag';
+import { RegenerateCredentialDialog } from './CredentialDialogs';
 
 function getTagId(tag: Tag) {
   return tag.tagId;
@@ -58,16 +57,15 @@ interface CredentialsListScreenProps {
 
 export function CredentialsListScreen({ type }: CredentialsListScreenProps) {
   const theme = useAppTheme();
+  const router = useRouter();
   const { filters } = useFilters();
   const technicalFilter = type === 'rfid' ? 'tipo:rfid' : 'tipo:nfc_mobile';
   const queryFilters = useMemo(() => [...filters, technicalFilter], [filters, technicalFilter]);
   const { page: currentPage, limit: currentLimit, setPage, setLimit } = usePaginationParams({ filters });
-  const [createVisible, setCreateVisible] = useState(false);
   const [regenerateVisible, setRegenerateVisible] = useState(false);
   const [tagToRegenerate, setTagToRegenerate] = useState<Tag | null>(null);
   const [deactivateVisible, setDeactivateVisible] = useState(false);
   const [tagToDeactivate, setTagToDeactivate] = useState<Tag | null>(null);
-  const [mobileCredential, setMobileCredential] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarVariant, setSnackbarVariant] = useState<'success' | 'error'>('success');
@@ -77,8 +75,6 @@ export function CredentialsListScreen({ type }: CredentialsListScreenProps) {
     limit: currentLimit,
     filters: queryFilters,
   });
-  const { data: usersResponse, isLoading: usersLoading } = useUsers({ limit: 100, filters: ['estado:activo'] });
-  const createTag = useCreateTag();
   const updateTag = useUpdateTag();
   const deleteTag = useDeleteTag();
 
@@ -88,31 +84,10 @@ export function CredentialsListScreen({ type }: CredentialsListScreenProps) {
   const pagination = tagsResponse?.meta;
   const columns = getCredentialColumns(typeLabel);
 
-  const userOptions = (usersResponse?.data || []).map((user: User) => ({
-    label: `${user.name} ${user.lastname} · ${user.email}`,
-    value: user.userId,
-  }));
-
   const showMessage = (message: string, variant: 'success' | 'error') => {
     setSnackbarMessage(message);
     setSnackbarVariant(variant);
     setSnackbarVisible(true);
-  };
-
-  const handleCreate = async (data: PhysicalTagFormData | MobileTagFormData) => {
-    try {
-      const payload = isPhysical
-        ? { userId: data.userId, type, rawUid: (data as PhysicalTagFormData).rawUid }
-        : { userId: data.userId, type };
-      const result: CreateTagResponse = await createTag.mutateAsync(payload);
-      setCreateVisible(false);
-      if (!isPhysical && result.mobileCredential) {
-        setMobileCredential(result.mobileCredential);
-      }
-      showMessage(`${typeLabel} creada correctamente`, 'success');
-    } catch (e: unknown) {
-      showMessage(isApiError(e) ? e.message : `Error al crear ${typeLabel}`, 'error');
-    }
   };
 
   const handleRegenerate = async (data: RegenerateTagFormData) => {
@@ -136,13 +111,6 @@ export function CredentialsListScreen({ type }: CredentialsListScreenProps) {
       showMessage(`${typeLabel} desactivada correctamente`, 'success');
     } catch (e: unknown) {
       showMessage(isApiError(e) ? e.message : `Error al desactivar ${typeLabel}`, 'error');
-    }
-  };
-
-  const copyMobileCredential = async () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      await navigator.clipboard.writeText(mobileCredential);
-      showMessage('Credencial copiada al portapapeles', 'success');
     }
   };
 
@@ -172,21 +140,15 @@ export function CredentialsListScreen({ type }: CredentialsListScreenProps) {
             {isPhysical ? 'Tarjetas y llaves NFC asociadas a usuarios' : 'Credenciales móviles generadas para usuarios'}
           </Text>
         </View>
-        <Button icon="plus" mode="contained" onPress={() => setCreateVisible(true)} style={{ backgroundColor: theme.colors.success }}>
+        <Button
+          icon="plus"
+          mode="contained"
+          onPress={() => router.push(isPhysical ? '/credentials/physical/create' : '/credentials/mobile/create')}
+          style={{ backgroundColor: theme.colors.success }}
+        >
           Crear {typeLabel}
         </Button>
       </View>
-
-      {mobileCredential ? (
-        <View style={[styles.onceCard, { borderColor: theme.colors.warning, backgroundColor: addOpacity(theme.colors.warning, 0.08) }]}>
-          <View style={styles.onceText}>
-            <Text variant="titleSmall" style={{ color: theme.colors.warning }}>Esta credencial solo se muestra una vez</Text>
-            <Text selectable variant="bodyMedium" style={{ color: theme.colors.onSurface }}>{mobileCredential}</Text>
-          </View>
-          <Button mode="outlined" onPress={copyMobileCredential}>Copiar</Button>
-          <IconButton icon="close" onPress={() => setMobileCredential('')} />
-        </View>
-      ) : null}
 
       <DataTable
         data={tags}
@@ -253,16 +215,6 @@ export function CredentialsListScreen({ type }: CredentialsListScreenProps) {
         )}
       />
 
-      <CreateCredentialDialog
-        visible={createVisible}
-        type={type}
-        userOptions={userOptions}
-        usersLoading={usersLoading}
-        isLoading={createTag.isPending}
-        onDismiss={() => setCreateVisible(false)}
-        onSubmit={handleCreate}
-      />
-
       <RegenerateCredentialDialog
         visible={regenerateVisible}
         credentialLabel={tagToRegenerate ? getUserName(tagToRegenerate) : ''}
@@ -299,8 +251,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 24, paddingHorizontal: 2, paddingBottom: 4 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 22, gap: 16 },
-  onceCard: { borderWidth: 1, borderRadius: 16, padding: 12, marginBottom: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  onceText: { flex: 1, gap: 4 },
   cellUser: { flex: 1.8, flexDirection: 'row', alignItems: 'center', gap: 12 },
   userText: { flex: 1 },
   cellType: { flex: 0.9, justifyContent: 'center' },
