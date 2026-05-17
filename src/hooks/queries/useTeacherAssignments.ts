@@ -9,12 +9,13 @@ export const teacherAssignmentKeys = {
   list: (filters?: TeacherAssignmentsFilters) => [...teacherAssignmentKeys.lists(), filters] as const,
 };
 
-export function useTeacherAssignments(filters?: TeacherAssignmentsFilters) {
+export function useTeacherAssignments(filters?: TeacherAssignmentsFilters, enabled = true) {
   return useQuery({
     queryKey: teacherAssignmentKeys.list(filters),
     queryFn: () => teacherAssignmentService.getAllAssignments(filters),
     staleTime: 1000 * 60 * 2,
     placeholderData: keepPreviousData,
+    enabled,
   });
 }
 

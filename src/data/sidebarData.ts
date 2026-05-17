@@ -51,7 +51,6 @@ export const sidebarMenuItemsData: MenuItem[] = [
     label: 'Control de Acceso',
     icon: 'shield-lock',
     route: '/access/permissions',
-    badge: 5,
   },
   {
     id: 'notifications',

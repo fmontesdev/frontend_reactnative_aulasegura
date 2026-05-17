@@ -14,6 +14,7 @@ interface FormTextInputProps<T extends FieldValues> {
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   multiline?: boolean;
   numberOfLines?: number;
+  disabled?: boolean;
 }
 
 export function FormTextInput<T extends FieldValues>({
@@ -26,6 +27,7 @@ export function FormTextInput<T extends FieldValues>({
   autoCapitalize = 'sentences',
   multiline = false,
   numberOfLines,
+  disabled = false,
 }: FormTextInputProps<T>) {
   const theme = useAppTheme();
   const error = errors[name];
@@ -49,6 +51,7 @@ export function FormTextInput<T extends FieldValues>({
             autoCapitalize={autoCapitalize}
             multiline={multiline}
             numberOfLines={numberOfLines}
+            disabled={disabled}
             style={[styles.input, { backgroundColor: theme.colors.onTertiary }]}
             outlineColor={theme.colors.outline}
             activeOutlineColor={theme.colors.tertiary}
