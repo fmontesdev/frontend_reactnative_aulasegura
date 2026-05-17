@@ -40,4 +40,36 @@ export const styles = StyleSheet.create({
     marginTop: 32,
     marginBottom: 32,
   },
+  academicSummaryCard: {
+    marginTop: 20,
+    marginHorizontal: 0,
+  },
+  academicSummaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 16,
+    flexWrap: 'wrap',
+  },
+  academicSummaryTitleGroup: {
+    gap: 2,
+  },
+  academicCoursesContainer: {
+    gap: 14,
+  },
+  academicCourseBlock: {
+    gap: 8,
+  },
+  academicCourseHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  academicSubjectsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
 });

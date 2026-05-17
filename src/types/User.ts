@@ -5,6 +5,19 @@
 import { DepartmentBasic } from './Department';
 import { Pagination } from './Pagination';
 
+export interface TeacherCourseSubjectSummary {
+  subjectId: number;
+  subjectCode: string;
+  name: string;
+}
+
+export interface TeacherCourseSummary {
+  courseId: number;
+  courseCode: string;
+  name: string;
+  subjects: TeacherCourseSubjectSummary[];
+}
+
 // Enum de roles disponibles
 export enum RoleName {
   ADMIN = 'admin',
@@ -25,6 +38,7 @@ export interface User {
   validTo?: string | null;
   createdAt?: string;
   department?: DepartmentBasic;
+  courses?: TeacherCourseSummary[] | null;
 }
 
 // Respuesta paginada de usuarios

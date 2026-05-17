@@ -13,6 +13,7 @@ const ACCESS_LOGS_SEARCH_HELP = `Ejemplos válidos:\njuan\ndenegado\ntiempo agot
 const ROOMS_SEARCH_HELP = `Ejemplos válidos:\nlab\nnombre:A101\nbuilding:1\nfloor:0\ncourse:ESO`;
 const READERS_SEARCH_HELP = `Ejemplos válidos:\nreader-01\ncode:reader-01\ncodigo:reader-01\nroom:A101\nactive:true\nactive:false`;
 const CREDENTIALS_SEARCH_HELP = `Ejemplos válidos:\njuan\nusuario:juan\nemail:@centro.es\ntipo:rfid\ntipo:nfc_mobile\nestado:activo`;
+const TEACHER_ASSIGNMENTS_SEARCH_HELP = `Ejemplos válidos:\nteacherId:user-1\nprofesor:garcia\nemail:@centro.es\ncurso:1ESO\nasignatura:matematicas\nestado:activo\nestado:inactivo`;
 const DEFAULT_SEARCH_HELP = `Introduce texto y pulsa Enter o , para crear un filtro.\nEjemplos:\njuan\nemail:@gmail.com\nestado:activo`;
 
 function getSearchHelp(pathname: string) {
@@ -20,6 +21,7 @@ function getSearchHelp(pathname: string) {
   if (pathname === '/spaces/classrooms') return ROOMS_SEARCH_HELP;
   if (pathname === '/spaces/readers') return READERS_SEARCH_HELP;
   if (pathname === '/credentials/physical' || pathname === '/credentials/mobile') return CREDENTIALS_SEARCH_HELP;
+  if (pathname === '/academic/assignments') return TEACHER_ASSIGNMENTS_SEARCH_HELP;
 
   return DEFAULT_SEARCH_HELP;
 }

@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AvatarPicker, AvatarPickerRef } from '../AvatarPicker';
 import { StyledSnackbar } from '../StyledSnackbar';
 import { BaseUserFormFields } from './BaseUserFormFields';
+import { TeacherAcademicSummary } from './TeacherAcademicSummary';
 import { FormTextInput } from '../FormTextInput';
 import { useAppTheme } from '../../theme';
 import { UserEditSchema, UserEditFormData, UserCreateFormData } from '../../schemas/user.schema';
@@ -169,6 +170,13 @@ export function EditUserForm({ onSubmit, isLoading = false, initialData }: EditU
           />
         </View>
       </View>
+
+      {initialData.roles.includes(RoleName.TEACHER) ? (
+        <TeacherAcademicSummary
+          userId={initialData.userId}
+          courses={initialData.courses || []}
+        />
+      ) : null}
 
       {/* Botón Submit */}
       <View style={styles.submitButtonContainer}>
