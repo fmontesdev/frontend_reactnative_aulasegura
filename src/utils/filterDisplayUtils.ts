@@ -23,7 +23,7 @@ export function normalizeFilterValue(filter: string) {
     }
 
     if (value === 'nfc movil' || value === 'nfc mobile' || value === 'movil') {
-      return `${rawKey}:nfc`;
+      return `${rawKey}:nfc_mobile`;
     }
   }
 
@@ -44,7 +44,7 @@ export function formatFilterLabel(filter: string) {
     return `${rawKey}:NFC física`;
   }
 
-  if ((key === 'tipo' || key === 'type') && value === 'nfc') {
+  if ((key === 'tipo' || key === 'type') && (value === 'nfc' || value === 'nfc_mobile')) {
     return `${rawKey}:NFC móvil`;
   }
 

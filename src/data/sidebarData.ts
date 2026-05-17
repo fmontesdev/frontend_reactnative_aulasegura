@@ -38,7 +38,7 @@ export const sidebarMenuItemsData: MenuItem[] = [
     id: 'credentials',
     label: 'Credenciales',
     icon: 'card-account-details',
-    route: '/credentials/rfid',
+    route: '/credentials/physical',
   },
   {
     id: 'spaces',
